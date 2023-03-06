@@ -7,7 +7,7 @@ const getAllEmployees = (req, res) => {
 
     employeeModel
         .find()
-        .populate("annual_vacations role schedule")
+        .populate("annual_vacations sick_vacations role schedule")
         .exec()
         .then((employees) => {
             if (employees.length) {
@@ -136,7 +136,7 @@ const login = (req, res) => {
             err:err.message
         })
     })
- }
+}
 
 
 
