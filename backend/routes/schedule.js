@@ -1,10 +1,11 @@
 const express = require("express")
 
-const {} = require("../controllers/schedule")
+const {createSchedule} = require("../controllers/schedule")
 
 
 const scheduleRouter = express.Router();
 
+scheduleRouter.post("/:id",createSchedule)
 
 
 module.exports = scheduleRouter

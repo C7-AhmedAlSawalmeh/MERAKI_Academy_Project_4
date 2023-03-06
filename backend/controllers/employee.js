@@ -7,7 +7,7 @@ const getAllEmployees = (req, res) => {
 
     employeeModel
         .find()
-        .populate("role")
+        .populate("annual_vacations role schedule")
         .exec()
         .then((employees) => {
             if (employees.length) {

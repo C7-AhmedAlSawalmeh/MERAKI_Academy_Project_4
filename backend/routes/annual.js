@@ -1,10 +1,10 @@
 const express = require("express")
 
-const {} = require("../controllers/annual")
+const {calculateAnnual} = require("../controllers/annual")
 
 
 const annualRouter = express.Router();
 
-
+annualRouter.post("/",calculateAnnual)
 
 module.exports = annualRouter
