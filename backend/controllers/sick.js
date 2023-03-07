@@ -68,23 +68,20 @@ const updateSick = (req,res)=>{
     const id = req.params.id
     const update = req.body
     sickModel
-    .findByIdAndDelete({id},update,{new:true})
+    .findByIdAndUpdate({id},update,{new:true})
     .then((result)=>{
-        employeeModel
-        .findByIdAndUpdate({_id:result.employee_id},{sick_vacations:result._id},{new:true})
-        .then((result)=>{
-            res.status(202).json({
-                success:true,
-                message:"The schedule updated",
-                schdule:result.sick_vacations
-            })
-        }).catch((err)=>{
-            res.status(500).json({
+        if(!result){
+            return res.status(403).json({
                 success:false,
-                message:"Server Error",
-                err:err.message
+                message:"Wrong call"
             })
+        }
+        res.sataus(202).json({
+            success:true,
+            message:"Sick updated",
+            sick_vacations:result.sick_vacations
         })
+        
     }).catch((err)=>{
         res.status(500).json({
             success:false,

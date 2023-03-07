@@ -1,11 +1,13 @@
 const express = require("express")
 
-const {createSchedule} = require("../controllers/schedule")
-
+const {createSchedule,updateScheduleById} = require("../controllers/schedule")
+const authentication = require("../middleware/authentication");
+const authorization = require("../middleware/authorization");
 
 const scheduleRouter = express.Router();
 
-scheduleRouter.post("/:id",createSchedule)
+scheduleRouter.post("/:id",authentication,authorization("DoEveryThing") ,createSchedule)
+scheduleRouter.put("/update/:id",authentication,authorization("DoEveryThing") ,updateScheduleById)
 
 
 module.exports = scheduleRouter

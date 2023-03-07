@@ -42,9 +42,35 @@ const createSchedule = (req, res) => {
         })
 }
 
+const updateScheduleById = (req, res) => {
+    const id = req.params.id
+    const update = req.body
+    scheduleModel
+        .findByIdAndUpdate({ _id: id }, update, { new: true })
+        .then((result) => {
+            if (!result) {
+                return res.status(403).json({
+                    success: false,
+                    message: "Wrong call"
+                })
+            }
+            res.sataus(202).json({
+                success: true,
+                message: "Schedule updated",
+                schedule: result
+            })
+        }).catch((err) => {
+            res.status(500).json({
+                success: false,
+                message: "Server Error",
+                err: err.message
+            })
+        })
+}
 
 
 
 module.exports = {
-    createSchedule
+    createSchedule,
+    updateScheduleById
 }

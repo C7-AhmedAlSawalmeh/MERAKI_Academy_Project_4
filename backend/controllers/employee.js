@@ -86,6 +86,30 @@ const getEmployeesByRole = (req, res) => {
             })
         })
 }
+const getEmployeesById = (req,res)=>{
+const id = req.params.id
+employeeModel
+.findById({_id:id})
+.then((result)=>{
+    if(!result){
+        return res.status(404).json({
+            sucsses: false,
+            message: "There is no employee for this id"
+        })
+    }
+    res.status(200).json({
+        sucsses:true,
+        message:"The employee details for this id",
+        employee:result
+    })
+}).catch((err) => {
+    res.status(500).json({
+        sucsses: false,
+        message: "Server Error",
+        err: err.message
+    })
+})
+}
 const deleteEmployeeById =(req,res)=>{
     const id = req.params.id
     employeeModel
@@ -198,5 +222,6 @@ module.exports = {
     getEmployeesByRole,
     deleteEmployeeById,
     updateEmployeeById,
+    getEmployeesById,
     login
 }

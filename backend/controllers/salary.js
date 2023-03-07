@@ -41,7 +41,33 @@ const calculateSalary = (req, res) => {
 
 }
 
+const updateSalaryById = (req,res)=>{
+    const id = req.params.id
+    const update = req.body
+    salaryModel
+    .findByIdAndUpdate({_id:id},update,{new:true})
+    .then((result)=>{
+        if(!result){
+            return res.status(403).json({
+                sucsses:false,
+                message:"Wrong call"
+            })
+        }
+        res.status(202).json({
+            sucsses:true,
+            message:"Salary updated",
+            salary:result.hourly_salary
+        })
+    }).catch((err)=>{
+        res.status(500).json({
+            sucsses:false,
+            message:"Server Error",
+            err:err.message
+        })
+    })
+}
 
 module.exports = {
-    calculateSalary
+    calculateSalary,
+    updateSalaryById
 }

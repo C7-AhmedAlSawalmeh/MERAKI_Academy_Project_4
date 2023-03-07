@@ -43,8 +43,22 @@ const deleteHRbyId = (req,res)=>{
     hrModel
     .findByIdAndDelete({_id:id})
     .then((result)=>{
-        employeeModel
-        .findByIdAndUpdate({_id:result.employee_id},)
+       if(!result){
+        return res.status(403).json({
+            sucsses:false,
+            message:"Wrong call"
+        })
+       }
+       res.status(202).json({
+        sucsses:true,
+        message:"HR action deleted"
+       })
+    }).catch((err)=>{
+        res.status(500).json({
+            sucsses:false,
+            message:"Server Error",
+            err:err.message
+        })
     })
 }
 
