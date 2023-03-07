@@ -64,9 +64,38 @@ const calculateSick = (req, res) => {
         })
 
 }
-
+const updateSick = (req,res)=>{
+    const id = req.params.id
+    const update = req.body
+    sickModel
+    .findByIdAndDelete({id},update,{new:true})
+    .then((result)=>{
+        employeeModel
+        .findByIdAndUpdate({_id:result.employee_id},{sick_vacations:result._id},{new:true})
+        .then((result)=>{
+            res.status(202).json({
+                success:true,
+                message:"The schedule updated",
+                schdule:result.sick_vacations
+            })
+        }).catch((err)=>{
+            res.status(500).json({
+                success:false,
+                message:"Server Error",
+                err:err.message
+            })
+        })
+    }).catch((err)=>{
+        res.status(500).json({
+            success:false,
+            message:"Server Error",
+            err:err.message
+        })
+    })
+}
 
 
 module.exports = {
-    calculateSick
+    calculateSick,
+    updateSick
 }

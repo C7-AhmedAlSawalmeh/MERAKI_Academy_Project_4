@@ -1,10 +1,11 @@
 const express = require("express")
 
-const {confirmAttendence} = require("../controllers/attendence")
+const {confirmStartAttendence,confirmEndAttendence} = require("../controllers/attendence")
 
 
 const attendenceRouter = express.Router();
 
-attendenceRouter.post("/",confirmAttendence)
+attendenceRouter.post("/",confirmStartAttendence)
+attendenceRouter.put("/:id",confirmEndAttendence)
 
 module.exports = attendenceRouter

@@ -13,7 +13,7 @@ const employeeSchema = new mongoose.Schema({
     schedule: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Schedule' }],
     sick_vacations: { type: mongoose.Schema.Types.ObjectId, ref: 'SickVacation' },
     annual_vacations: { type: mongoose.Schema.Types.ObjectId, ref: 'AnnualVacation' },
-    hr_actions: { type: mongoose.Schema.Types.ObjectId, ref: 'HrAction' },
+    hr_actions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'HrAction' }],
     role: { type: mongoose.Schema.Types.ObjectId, ref: "Role" },
     salary: { type: mongoose.Schema.Types.ObjectId , ref:"Salary" }
 })

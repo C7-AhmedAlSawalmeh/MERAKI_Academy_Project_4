@@ -64,11 +64,40 @@ const calculateAnnual = (req, res) => {
         })
 
 }
-
+const updateAnnual = (req,res)=>{
+    const id = req.params.id
+    const update = req.body
+    annualModel
+    .findByIdAndDelete({id},update,{new:true})
+    .then((result)=>{
+        employeeModel
+        .findByIdAndUpdate({_id:result.employee_id},{annual_vacations:result._id},{new:true})
+        .then((result)=>{
+            res.status(202).json({
+                success:true,
+                message:"The schedule updated",
+                schdule:result.annual_vacations
+            })
+        }).catch((err)=>{
+            res.status(500).json({
+                success:false,
+                message:"Server Error",
+                err:err.message
+            })
+        })
+    }).catch((err)=>{
+        res.status(500).json({
+            success:false,
+            message:"Server Error",
+            err:err.message
+        })
+    })
+}
 
 
 
 
 module.exports = {
-    calculateAnnual
+    calculateAnnual,
+    updateAnnual,
 }

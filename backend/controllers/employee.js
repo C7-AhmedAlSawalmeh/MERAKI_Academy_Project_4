@@ -1,13 +1,13 @@
 const employeeModel = require("../models/employeeSchema")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
-const dotenv = require("dotenv")
+
 
 const getAllEmployees = (req, res) => {
 
     employeeModel
         .find()
-        .populate("annual_vacations sick_vacations role schedule salary")
+        .populate("annual_vacations sick_vacations role schedule salary hr_actions")
         .exec()
         .then((employees) => {
             if (employees.length) {
@@ -86,6 +86,56 @@ const getEmployeesByRole = (req, res) => {
             })
         })
 }
+const deleteEmployeeById =(req,res)=>{
+    const id = req.params.id
+    employeeModel
+    .findByIdAndDelete({id})
+    .then((result)=>{
+        if(!result){
+            return res.status(404).json({
+                sucsses:false,
+                message:"This employee is not in the company"
+            })
+        }
+        res.status(200).json({
+            sucsses:true,
+            message:"Employee's file deleted"
+        })
+    }).catch((err)=>{
+        res.status(500).json({
+            sucsses:false,
+            message:"Server Error",
+            err:err.message
+        })
+    })
+}
+const updateEmployeeById = (req,res)=>{
+    const id = req.params.id
+    const update = req.body
+    employeeModel
+    .findByIdAndUpdate({id},update,{new:true})
+    .then((result)=>{
+        if(!result){
+            return res.status(403).json({
+                sucsses:false,
+                message:"This employee is not in the company",
+
+            })
+        }
+        res.status(202).json({
+            sucsses:true,
+            message:"Employee's file updated",
+            employee:result
+        })
+    }).catch((err)=>{
+        res.status(500).json({
+            sucsses:false,
+            message:"Server Error",
+            err:err.message
+        })
+
+    })
+}
 const login = (req, res) => {
     const password = req.body.password;
     const email = req.body.email.toLowerCase();
@@ -146,5 +196,7 @@ module.exports = {
     getAllEmployees,
     createNewEmployee,
     getEmployeesByRole,
+    deleteEmployeeById,
+    updateEmployeeById,
     login
 }
