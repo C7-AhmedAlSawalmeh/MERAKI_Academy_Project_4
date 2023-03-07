@@ -29,7 +29,7 @@ const calculateAnnual = (req, res) => {
                     employeeModel
                         .findOneAndUpdate(
                             { _id: employee_id },
-                            { $push: { annual_vacations: newAnnual._id } },
+                            { $set: { annual_vacations: newAnnual._id } },
                             { new: true }
                         )
                         .then(() => {

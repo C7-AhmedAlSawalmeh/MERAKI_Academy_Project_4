@@ -11,6 +11,8 @@ const roleRouter = require("./routes/role")
 const scheduleRouter = require("./routes/schedule")
 const annualRouter = require("./routes/annual")
 const sickRouter=require("./routes/sick")
+const salaryRouter = require("./routes/salary")
+const attendenceRouter=require("./routes/attendence")
 
 app.use(cors());
 app.use(express.json());
@@ -20,6 +22,8 @@ app.use("/role",roleRouter)
 app.use("/schedule",scheduleRouter)
 app.use("/annual",annualRouter)
 app.use("/sick",sickRouter)
+app.use("/salary",salaryRouter)
+app.use("/attendence",attendenceRouter)
 // Handles any other endpoints [unassigned - endpoints]
 app.use("*", (req, res) => res.status(404).json("NO content at this path"));
 

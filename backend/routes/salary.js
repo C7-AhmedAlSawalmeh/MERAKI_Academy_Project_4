@@ -1,9 +1,11 @@
 const express = require("express")
 
-const {} = require("../controllers/salary")
+const {calculateSalary} = require("../controllers/salary")
 
 
 const salaryRouter = express.Router();
+
+salaryRouter.post("/",calculateSalary)
 
 
 

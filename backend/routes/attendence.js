@@ -1,10 +1,10 @@
 const express = require("express")
 
-const {} = require("../controllers/attendence")
+const {confirmAttendence} = require("../controllers/attendence")
 
 
 const attendenceRouter = express.Router();
 
-
+attendenceRouter.post("/",confirmAttendence)
 
 module.exports = attendenceRouter

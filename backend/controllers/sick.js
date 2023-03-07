@@ -29,7 +29,7 @@ const calculateSick = (req, res) => {
                     employeeModel
                         .findOneAndUpdate(
                             { _id: employee_id },
-                            { $push: { sick_vacations: newSick._id } },
+                            { $set: { sick_vacations: newSick._id } },
                             { new: true }
                         )
                         .then(() => {
