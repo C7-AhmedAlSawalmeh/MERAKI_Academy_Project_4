@@ -194,7 +194,8 @@ const login = (req, res) => {
             res.status(200).json({
                 sucsses:true,
                 message:"Welcome",
-                token:token
+                token:token,
+                role:result.role
             })
 
         }catch(err){

@@ -15,6 +15,16 @@
     background-color: #CC3262;
     opacity: .9;
     margin-right: 50px;
+    
+}
+.logOutBtn{
+    cursor: pointer;
+    height: 50px;
+    width: 120px;
+    border-radius: 15px;
+    background-color: #CC3262;
+    opacity: .9;
+    margin-right: 50px;
 }
 
 .loginBtn:hover {
