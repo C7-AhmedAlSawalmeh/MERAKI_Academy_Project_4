@@ -1,0 +1,10 @@
+.bottomContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 70px;
+    background-color: #014751;
+    margin: 0px;
+    padding: 0px;
+}

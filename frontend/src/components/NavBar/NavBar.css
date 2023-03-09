@@ -1,3 +1,27 @@
-.navContainer{
+.navContainer {
+    background-color: #014751;
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+
+}
+
+.loginBtn {
+    cursor: pointer;
+    height: 50px;
+    width: 120px;
+    border-radius: 15px;
+    background-color: #CC3262;
+    opacity: .9;
+    margin-right: 50px;
+}
+
+.loginBtn:hover {
+    opacity: 1;
+}
+
+.logo {
+    cursor: pointer;
+    margin-left: 50px;
 }
