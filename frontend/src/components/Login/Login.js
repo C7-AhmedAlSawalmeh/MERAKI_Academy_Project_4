@@ -10,7 +10,7 @@ const Login = () => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [answer, setAnswer] = useState("")
-    const { isLoggedIn,setIsLoggedIn,token,setToken } = useContext(Data)
+    const { isLoggedIn,setIsLoggedIn,token,setToken,managerLogged, setManagerLogged } = useContext(Data)
     const navigate = useNavigate()
 
     const handleSubmit = async (e) => {
@@ -25,11 +25,13 @@ const Login = () => {
             setToken(response.data.token)
             setIsLoggedIn(true)
             setAnswer(response.data.message)
+            
             if (response.data.role.permissions[0]== "DoEveryThing"){
                 navigate("/managerPage")
+                setManagerLogged(true)
             }
             if(response.data.role.permissions[0]== "JustSee"){
-                
+
             }
             
               

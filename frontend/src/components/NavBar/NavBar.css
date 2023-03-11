@@ -26,8 +26,16 @@
     opacity: .9;
     margin-right: 50px;
 }
-
-.loginBtn:hover {
+.registerBtn{
+    cursor: pointer;
+    height: 50px;
+    width: 120px;
+    border-radius: 15px;
+    background-color: #CC3262;
+    opacity: .9;
+    margin-right: 50px;
+}
+.loginBtn:hover, .logOutBtn:hover , .registerBtn:hover {
     opacity: 1;
 }
 
