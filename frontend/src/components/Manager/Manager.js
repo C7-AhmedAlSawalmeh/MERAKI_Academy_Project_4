@@ -10,11 +10,14 @@ const Manager = () => {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
     const [employee, setEmployee] = useState("")
-    const { token, setToken } = useContext(Data)
     const [salaryClicked, setSalaryClicked] = useState(false)
-    const [clickId, setClickId] = useState("")
     const [valueOfSalary, setValueOfSalary] = useState("")
     const [salaryClickId, setSalaryClickId] = useState("")
+    const [HrBtnClicked, setHrBtnClicked] = useState(false)
+    const [hrAction, setHrAction] = useState('')
+
+    const { token, setToken } = useContext(Data)
+
     const loadMoreData = async () => {
         if (loading) {
             return;
@@ -35,7 +38,7 @@ const Manager = () => {
         }
     };
     const handleClickName = async (employeeId) => {
-        setClickId(employeeId)
+
         try {
             const response = await axios.get(`http://localhost:5000/employee/id/${employeeId}`, {
                 headers: {
@@ -61,6 +64,7 @@ const Manager = () => {
                     Authorization: `Bearer ${token}`
                 }
             })
+
 
         } catch (err) {
             console.log(err)
@@ -90,33 +94,49 @@ const Manager = () => {
             hourly_salary: valueOfSalary
         }
         try {
-            const response =await axios.post("http://localhost:5000/salary", employee, {
+            const response = await axios.post("http://localhost:5000/salary", employee, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             })
-            console.log(response)
-         
+            console.log(response.data)
+            //setTestEmplyoee(response.data.salary)
+
         } catch (err) {
             console.log(err)
+        }
+    }
+    const handleHRclick = async (employeeId) => {
+        const employee = {
+            employee_id: employeeId,
+            reason:""
+
+        }
+        try {
+            const response = await axios.post("http://localhost:5000/hrAction", employee, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+        } catch (err) {
+
         }
     }
     if (employee) {
         calculateAnnual(employee._id)
         calculateSick(employee._id)
+
     }
-    if(salaryClickId){
+    if (salaryClicked) {
         calculateSalary(employee._id)
+
     }
-    
+
     useEffect(() => {
         loadMoreData();
-        
-        // if(salaryClickId){
-        //     calculateSalary(employee._id)
-        // }
-    }, []);
 
+
+    }, []);
 
     return (
         <div className='managerPage'>
@@ -133,7 +153,7 @@ const Manager = () => {
                 <InfiniteScroll
                     dataLength={data.length}
                     next={loadMoreData}
-                    hasMore={data.length < 3}
+                    hasMore={data.length < 1}
                     loader={
                         <Skeleton
                             avatar
@@ -179,34 +199,32 @@ const Manager = () => {
                     </Descriptions.Item>
                     <Descriptions.Item label="Status" span={3} >
 
-                        <Badge status="processing" text="Running" />
+                        <Badge status="processing" text="Active" />
                     </Descriptions.Item>
                     <Descriptions.Item label="Annual Vacations">{employee.annual_vacations.annual_days}</Descriptions.Item>
                     <Descriptions.Item label="Sick Vacations">{employee.sick_vacations.sick_days}</Descriptions.Item>
                     <Descriptions.Item label="Salary"><button onClick={() => {
-                        
+
                         setSalaryClickId(employee._id)
                         setSalaryClicked(!salaryClicked)
-                       
+
                     }}>Edit Salary</button>
                         {salaryClicked && salaryClickId === employee._id && <input placeholder="Hourly" onChange={(e) => {
                             setValueOfSalary(e.target.value)
+
                         }}></input>}
-                        <p>{employee.salary.hourly_salary*8}JOD</p>
+                        <p>{employee.salary.hourly_salary * 8}JOD</p>
                     </Descriptions.Item>
-                    <Descriptions.Item label="HR Actions">
-                        Data disk type: MongoDB
+                    <Descriptions.Item label="HR Actions" >
+                        <button onClick={() => {
+                            handleHRclick(employee._id)
+                            setHrBtnClicked(!HrBtnClicked)
+                        }}>Add HR action</button>
+                        {employee.hr_actions[0]}
                         <br />
                         Database version: 3.4
                         <br />
-                        Package: dds.mongo.mid
-                        <br />
-                        Storage space: 10 GB
-                        <br />
-                        Replication factor: 3
-                        <br />
-                        Region: East China 1
-                        <br />
+
                     </Descriptions.Item>
                 </Descriptions>
                 </div>}
