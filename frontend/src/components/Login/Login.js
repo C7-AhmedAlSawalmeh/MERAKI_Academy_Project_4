@@ -10,7 +10,7 @@ const Login = () => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [answer, setAnswer] = useState("")
-    const { isLoggedIn,setIsLoggedIn,token,setToken,managerLogged, setManagerLogged } = useContext(Data)
+    const { isLoggedIn,setIsLoggedIn,token,setToken,managerLogged, setManagerLogged,normalToken, setNormalToken } = useContext(Data)
     const navigate = useNavigate()
 
     const handleSubmit = async (e) => {
@@ -21,17 +21,21 @@ const Login = () => {
         }
         try{
             const response = await axios.post("http://localhost:5000/employee/login",employee)
-            localStorage.setItem("token",response.data.token)
-            setToken(response.data.token)
+            
+            
             setIsLoggedIn(true)
             setAnswer(response.data.message)
             
             if (response.data.role.permissions[0]== "DoEveryThing"){
+                localStorage.setItem("token",response.data.token)
+                setToken(response.data.token)
                 navigate("/managerPage")
                 setManagerLogged(true)
             }
             if(response.data.role.permissions[0]== "JustSee"){
-
+                localStorage.setItem("normalToken",response.data.token)
+                setNormalToken(response.data.token)
+                navigate("/employeePage")
             }
             
               
