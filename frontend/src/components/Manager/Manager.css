@@ -1,4 +1,10 @@
 .managerPage{
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+}
+#scrollableDiv{
+    margin-right: 250px;
+}
+.emplyoeeProfile{
+width: 900px;
 }
