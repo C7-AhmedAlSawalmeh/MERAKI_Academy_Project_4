@@ -13,11 +13,11 @@ const createHRaction = (req, res) => {
         .then((result) => {
             employeeModel
                 .findByIdAndUpdate({ _id: employee_id }, { $push: { hr_actions: result._id } })
-                .then(() => {
+                .then((result) => {
                     res.status(201).json({
                         sucsses: true,
                         message: "HR Action submitted",
-                        Action: result.reason
+                        Action: result
                     })
                 }).catch((err) => {
                     res.status(500).json({

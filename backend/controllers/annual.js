@@ -10,7 +10,7 @@ const calculateAnnual = (req, res) => {
             const resultDate = new Date(result.date)
             const currentDate = new Date()
             const diffDays = Math.round((currentDate - resultDate) / (1000 * 60 * 60 * 24))
-            const calculateAnnualFinal = (diffDays * 1.14) / 30
+            const calculateAnnualFinal = Math.round((diffDays * 1.14) / 30)
             const newAnnual = new annualModel({
                 employee_id,
                 annual_days: calculateAnnualFinal

@@ -10,7 +10,7 @@ const calculateSick = (req, res) => {
             const resultDate = new Date(result.date)
             const currentDate = new Date()
             const diffDays = Math.round((currentDate - resultDate) / (1000 * 60 * 60 * 24))
-            const calculateSickFinal = (diffDays * 1.14) / 30
+            const calculateSickFinal = Math.round((diffDays * 1.14) / 30)
             const newSick = new sickModel({
                 employee_id,
                 sick_days: calculateSickFinal

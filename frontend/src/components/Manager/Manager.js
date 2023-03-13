@@ -14,6 +14,7 @@ const Manager = () => {
     const [valueOfSalary, setValueOfSalary] = useState("")
     const [salaryClickId, setSalaryClickId] = useState("")
     const [HrBtnClicked, setHrBtnClicked] = useState(false)
+    const [hrIdClick, setHrIdClick] = useState("")
     const [hrAction, setHrAction] = useState('')
 
     const { token, setToken } = useContext(Data)
@@ -89,6 +90,7 @@ const Manager = () => {
 
     }
     const calculateSalary = async (employeeId) => {
+        
         const employee = {
             employee_id: employeeId,
             hourly_salary: valueOfSalary
@@ -99,42 +101,40 @@ const Manager = () => {
                     Authorization: `Bearer ${token}`
                 }
             })
-            console.log(response.data)
-            //setTestEmplyoee(response.data.salary)
+            
+            
+            setEmployee(response.data.salary)
 
         } catch (err) {
             console.log(err)
         }
     }
     const handleHRclick = async (employeeId) => {
-        const employee = {
-            employee_id: employeeId,
-            reason:""
+        // const employee = {
+        //     employee_id: employeeId,
+        //     reason: ""
 
-        }
-        try {
-            const response = await axios.post("http://localhost:5000/hrAction", employee, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
-        } catch (err) {
+        // }
+        // try {
+        //     const response = await axios.post("http://localhost:5000/hrAction", employee, {
+        //         headers: {
+        //             Authorization: `Bearer ${token}`
+        //         }
+        //     })
+        // } catch (err) {
 
-        }
+        // }
     }
     if (employee) {
         calculateAnnual(employee._id)
         calculateSick(employee._id)
 
     }
-    if (salaryClicked) {
-        calculateSalary(employee._id)
-
-    }
 
     useEffect(() => {
         loadMoreData();
-
+       
+        
 
     }, []);
 
@@ -204,9 +204,10 @@ const Manager = () => {
                     <Descriptions.Item label="Annual Vacations">{employee.annual_vacations.annual_days}</Descriptions.Item>
                     <Descriptions.Item label="Sick Vacations">{employee.sick_vacations.sick_days}</Descriptions.Item>
                     <Descriptions.Item label="Salary"><button onClick={() => {
-
                         setSalaryClickId(employee._id)
                         setSalaryClicked(!salaryClicked)
+                        calculateSalary(employee._id)
+                        
 
                     }}>Edit Salary</button>
                         {salaryClicked && salaryClickId === employee._id && <input placeholder="Hourly" onChange={(e) => {
@@ -217,10 +218,12 @@ const Manager = () => {
                     </Descriptions.Item>
                     <Descriptions.Item label="HR Actions" >
                         <button onClick={() => {
-                            handleHRclick(employee._id)
+                            //handleHRclick(employee._id)
                             setHrBtnClicked(!HrBtnClicked)
+                            setHrIdClick(employee._id)
                         }}>Add HR action</button>
-                        {employee.hr_actions[0]}
+                        {HrBtnClicked&&employee._id==hrIdClick&&<input></input>}
+                        
                         <br />
                         Database version: 3.4
                         <br />
