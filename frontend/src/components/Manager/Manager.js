@@ -16,6 +16,7 @@ const Manager = () => {
     const [HrBtnClicked, setHrBtnClicked] = useState(false)
     const [hrIdClick, setHrIdClick] = useState("")
     const [hrAction, setHrAction] = useState('')
+    const [checkDelete, setCheckDelete] = useState(false)
 
     const { token, setToken } = useContext(Data)
 
@@ -47,6 +48,7 @@ const Manager = () => {
                 }
             })
             setEmployee(response.data.employee)
+            
 
 
         } catch (err) {
@@ -90,7 +92,7 @@ const Manager = () => {
 
     }
     const calculateSalary = async (employeeId) => {
-        
+
         const employee = {
             employee_id: employeeId,
             hourly_salary: valueOfSalary
@@ -101,8 +103,8 @@ const Manager = () => {
                     Authorization: `Bearer ${token}`
                 }
             })
-            
-            
+
+
             setEmployee(response.data.salary)
 
         } catch (err) {
@@ -110,20 +112,29 @@ const Manager = () => {
         }
     }
     const handleHRclick = async (employeeId) => {
-        // const employee = {
-        //     employee_id: employeeId,
-        //     reason: ""
-
-        // }
-        // try {
-        //     const response = await axios.post("http://localhost:5000/hrAction", employee, {
-        //         headers: {
-        //             Authorization: `Bearer ${token}`
-        //         }
-        //     })
-        // } catch (err) {
-
-        // }
+        
+        if(hrAction!=""){
+            const employee = {
+                employee_id: employeeId,
+                reason: hrAction
+    
+            }
+            try {
+                const response = await axios.post("http://localhost:5000/hrAction", employee, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+                setEmployee(response.data.Action)
+                
+                setHrAction("")
+                
+            } catch (err) {
+                console.log(err)
+    
+            }
+        }
+        
     }
     if (employee) {
         calculateAnnual(employee._id)
@@ -131,110 +142,137 @@ const Manager = () => {
 
     }
 
-    useEffect(() => {
-        loadMoreData();
-       
-        
+    const handleDeleteHR =async (id) => {
+        try{
+            const response = await axios.delete(`http://localhost:5000/hrAction/delete/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            console.log(response)
+            const newEmployee = data.filter((elem,i)=>{
+                return 
+            })
+            
+        }catch(err){
+            console.log(err)
+        }
+         }
 
-    }, []);
+        useEffect(() => {
+            loadMoreData();
+        }, []);
 
-    return (
-        <div className='managerPage'>
-            <div
-                id="scrollableDiv"
-                style={{
-                    width: 350,
-                    height: "100vh",
-                    overflow: 'auto',
-                    padding: '0 16px',
-                    border: '1px solid rgba(140, 140, 140, 0.35)',
-                }}
-            >
-                <InfiniteScroll
-                    dataLength={data.length}
-                    next={loadMoreData}
-                    hasMore={data.length < 1}
-                    loader={
-                        <Skeleton
-                            avatar
-                            paragraph={{
-                                rows: 1,
-                            }}
-                            active
-                        />
-                    }
-                    endMessage={<Divider plain>End ..</Divider>}
-                    scrollableTarget="scrollableDiv"
+        return (
+            <div className='managerPage'>
+                <div
+                    id="scrollableDiv"
+                    style={{
+                        width: 350,
+                        height: "100vh",
+                        overflow: 'auto',
+                        padding: '0 16px',
+                        border: '1px solid rgba(140, 140, 140, 0.35)',
+                    }}
                 >
-                    <List
-                        dataSource={data}
-                        renderItem={(employee) => (
-                            <List.Item key={employee.email}>
-                                <List.Item.Meta
+                    <InfiniteScroll
+                        dataLength={data.length}
+                        next={loadMoreData}
+                        hasMore={data.length < 1}
+                        loader={
+                            <Skeleton
+                                avatar
+                                paragraph={{
+                                    rows: 1,
+                                }}
+                                active
+                            />
+                        }
+                        endMessage={<Divider plain>End ..</Divider>}
+                        scrollableTarget="scrollableDiv"
+                    >
+                        <List
+                            dataSource={data}
+                            renderItem={(employee) => (
+                                <List.Item key={employee.email}>
+                                    <List.Item.Meta
 
-                                    title={<a onClick={() => {
-                                        handleClickName(employee._id)
+                                        title={<a onClick={() => {
+                                            handleClickName(employee._id)
 
-                                    }}>{employee.name}</a>}
+                                        }}>{employee.name}</a>}
 
-                                    description={employee.email}
+                                        description={employee.email}
 
-                                />
+                                    />
 
-                                <div>{employee.employeeId}</div>
-                            </List.Item>
-                        )}
-                    />
-                </InfiniteScroll>
+                                    <div>{employee.employeeId}</div>
+                                </List.Item>
+                            )}
+                        />
+                    </InfiniteScroll>
 
+                </div>
+                <div>
+                    {employee && <div className='emplyoeeProfile'> <Descriptions title={`${employee.name}'s Profile`} layout="vertical" bordered={true}>
+                        <Descriptions.Item label="Name">{employee.name}</Descriptions.Item>
+                        <Descriptions.Item label="Employee ID">{employee.employeeId}</Descriptions.Item>
+                        <Descriptions.Item label="Phone Number">{employee.phoneNumber}</Descriptions.Item>
+                        <Descriptions.Item label="Date of Entry">{employee.date}</Descriptions.Item>
+                        <Descriptions.Item label="Current Time" span={2}>
+                            {Date()}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Status" span={3} >
+
+                            <Badge status="processing" text="Active" />
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Annual Vacations">{employee.annual_vacations.annual_days}</Descriptions.Item>
+                        <Descriptions.Item label="Sick Vacations">{employee.sick_vacations.sick_days}</Descriptions.Item>
+                        <Descriptions.Item label="Salary"><button onClick={() => {
+                            setSalaryClickId(employee._id)
+                            setSalaryClicked(!salaryClicked)
+                            calculateSalary(employee._id)
+
+
+                        }}>Edit Salary</button>
+                            {salaryClicked && salaryClickId === employee._id && <input placeholder="Hourly" onChange={(e) => {
+                                setValueOfSalary(e.target.value)
+
+                            }}></input>}
+                            <p>{employee.salary.hourly_salary * 8}JOD</p>
+                        </Descriptions.Item>
+                        <Descriptions.Item label="HR Actions" >
+                            <button onClick={() => {
+
+                                setHrBtnClicked(!HrBtnClicked)
+                                setHrIdClick(employee._id)
+                                handleHRclick(employee._id)
+                            }}>Add HR action</button>
+                            {HrBtnClicked && employee._id == hrIdClick && <input placeholder='Put the reason here' onChange={(e) => {
+                                setHrAction(e.target.value)
+                            }}></input>}
+                            <br />
+                            {employee.hr_actions.map((elem, i) => {
+                                return <div key={i}>
+                                    <p>{elem.reason}</p>
+                                    <button onClick={()=>{
+                                        handleDeleteHR(elem._id)
+                                    }}>Delete HR</button>
+                                    </div>
+
+                            })}
+                            
+                            <br />
+                            Database version: 3.4
+                            <br />
+
+                        </Descriptions.Item>
+                    </Descriptions>
+                    </div>}
+
+                </div>
             </div>
-            <div>
-                {employee && <div className='emplyoeeProfile'> <Descriptions title={`${employee.name}'s Profile`} layout="vertical" bordered={true}>
-                    <Descriptions.Item label="Name">{employee.name}</Descriptions.Item>
-                    <Descriptions.Item label="Employee ID">{employee.employeeId}</Descriptions.Item>
-                    <Descriptions.Item label="Phone Number">{employee.phoneNumber}</Descriptions.Item>
-                    <Descriptions.Item label="Date of Entry">{employee.date}</Descriptions.Item>
-                    <Descriptions.Item label="Current Time" span={2}>
-                        {Date()}
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Status" span={3} >
+        )
+    }
 
-                        <Badge status="processing" text="Active" />
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Annual Vacations">{employee.annual_vacations.annual_days}</Descriptions.Item>
-                    <Descriptions.Item label="Sick Vacations">{employee.sick_vacations.sick_days}</Descriptions.Item>
-                    <Descriptions.Item label="Salary"><button onClick={() => {
-                        setSalaryClickId(employee._id)
-                        setSalaryClicked(!salaryClicked)
-                        calculateSalary(employee._id)
-                        
-
-                    }}>Edit Salary</button>
-                        {salaryClicked && salaryClickId === employee._id && <input placeholder="Hourly" onChange={(e) => {
-                            setValueOfSalary(e.target.value)
-
-                        }}></input>}
-                        <p>{employee.salary.hourly_salary * 8}JOD</p>
-                    </Descriptions.Item>
-                    <Descriptions.Item label="HR Actions" >
-                        <button onClick={() => {
-                            //handleHRclick(employee._id)
-                            setHrBtnClicked(!HrBtnClicked)
-                            setHrIdClick(employee._id)
-                        }}>Add HR action</button>
-                        {HrBtnClicked&&employee._id==hrIdClick&&<input></input>}
-                        
-                        <br />
-                        Database version: 3.4
-                        <br />
-
-                    </Descriptions.Item>
-                </Descriptions>
-                </div>}
-
-            </div>
-        </div>
-    )
-}
-
-export default Manager
+    export default Manager
