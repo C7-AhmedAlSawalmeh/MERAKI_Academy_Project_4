@@ -1,6 +1,7 @@
 import React from 'react'
 import "./Manager.css"
-import { Avatar, Divider, List, Skeleton, Descriptions, Badge } from 'antd';
+import { Avatar, Divider, List, Skeleton, Descriptions, Badge, Button, Modal, DatePicker, Space , Calendar  } from 'antd';
+import dayjs from 'dayjs';
 import { useEffect, useState, useContext } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import axios from 'axios';
@@ -8,6 +9,7 @@ import { Data } from "../../App"
 import "./Manager.css"
 import Employee from '../EmployeePage/Employee';
 import DescriptionsItem from 'antd/es/descriptions/Item';
+const { RangePicker } = DatePicker;
 const Manager = () => {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
@@ -18,10 +20,15 @@ const Manager = () => {
     const [HrBtnClicked, setHrBtnClicked] = useState(false)
     const [hrIdClick, setHrIdClick] = useState("")
     const [hrAction, setHrAction] = useState('')
-    const [checkDelete, setCheckDelete] = useState(false)
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [isMpdalOpen_2, setIsMpdalOpen_2] = useState(false)
+    const [selectStartDay, setSelectStartDay] = useState("")
+    const [selectEndDay, setSelectEndDay] = useState("")
+    const { RangePicker } = DatePicker;
+
 
     const { token, setToken } = useContext(Data)
-
+    // Call all the data ||-----------------------------------------------------------||
     const loadMoreData = async () => {
         if (loading) {
             return;
@@ -41,6 +48,7 @@ const Manager = () => {
             console.log(err)
         }
     };
+    // Show Data for specific employee ||---------------------------------||
     const handleClickName = async (employeeId) => {
 
         try {
@@ -57,7 +65,7 @@ const Manager = () => {
             console.log(err)
         }
     }
-
+    //Calculate the annual for the employee by id ||-----------------------------||
     const calculateAnnual = async (employeeId) => {
 
         const employee_Id = {
@@ -76,6 +84,7 @@ const Manager = () => {
         }
 
     }
+    //Calculate the sick for the employee by id ||-----------------------------||
     const calculateSick = async (employeeId) => {
         const employee_Id = {
             employee_id: employeeId
@@ -93,6 +102,7 @@ const Manager = () => {
         }
 
     }
+    //Calculate the salary for the employee by id ||-----------------------------||
     const calculateSalary = async (employeeId) => {
 
         const employee = {
@@ -113,6 +123,7 @@ const Manager = () => {
             console.log(err)
         }
     }
+    // Put HR action to the employee profile ||-----------------------------------------------------------||
     const handleHRclick = async (employeeId) => {
 
         if (hrAction != "") {
@@ -138,12 +149,7 @@ const Manager = () => {
         }
 
     }
-    if (employee) {
-        calculateAnnual(employee._id)
-        calculateSick(employee._id)
-
-    }
-
+    // Delete the HR action from the employee's profile ||-----------------------------------------------------------||
     const handleDeleteHR = async (id) => {
         try {
             const response = await axios.delete(`http://localhost:5000/hrAction/delete/${id}`, {
@@ -181,7 +187,164 @@ const Manager = () => {
             console.log(err)
         }
     }
+    //Show First Modal (Edit One) ||-----------------------------------------------------------||
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
+    //handle ok for the first Modal ||-----------------------------------------------------------||
+    const handleOk = async () => {
+        const schedule = {
+            employee_id:employee._id,
+            work_days:{
+                start_time:selectStartDay,
+                end_time:selectEndDay,
+                hours:8,
+                isWork:true
+            }
+        }
+try{
+    const response = await axios.post(`http://localhost:5000/schedule/${employee._id}`,schedule,{
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+    console.log(response)
+}catch(err){
+    console.log(err)
+}
+        setIsModalOpen(false);
 
+    };
+    //handle cencel for both modals ||-----------------------------------------------------------||
+    const handleCancel = () => {
+        setIsModalOpen(false);
+        setIsMpdalOpen_2(false)
+    };
+
+    // Handle the change on date in the date Picker||-----------------------------------------------------------||
+    const onChange = (date) => {
+        if (date) {
+            console.log('Date: ', date);
+        } else {
+            console.log('Clear');
+        }
+    };
+    // Handle the change on date in the date Picker||-----------------------------------------------------------||
+    const onRangeChange = (dates, dateStrings) => {
+        if (dates) {
+            // console.log('From: ', dates[0], ', to: ', dates[1]);
+            // console.log('From: ', dateStrings[0], ', to: ', dateStrings[1]);
+            setSelectStartDay(dateStrings[0])
+            setSelectEndDay(dateStrings[1])
+        } else {
+            console.log('Clear');
+        }
+    };
+    //Some fetures in the data picked "not needed"||-----------------------------------------------------------||
+    const rangePresets = [
+        {
+            label: 'Last 7 Days',
+            value: [dayjs().add(-7, 'd'), dayjs()],
+        },
+        {
+            label: 'Last 14 Days',
+            value: [dayjs().add(-14, 'd'), dayjs()],
+        },
+        {
+            label: 'Last 30 Days',
+            value: [dayjs().add(-30, 'd'), dayjs()],
+        },
+        {
+            label: 'Last 90 Days',
+            value: [dayjs().add(-90, 'd'), dayjs()],
+        },
+    ];
+
+    //handle ok for the 2nd Modal ||-----------------------------------------------------------||
+    const handleShowOk = ()=>{
+        setIsMpdalOpen_2(false);
+    }
+    //Show 2nd Modal (Show One) ||-----------------------------------------------------------||
+    const showModalShow = ( ) =>{
+        setIsMpdalOpen_2(true)
+    }
+    const getListData = (value) => {
+        let listData;
+        switch (value.date()) {
+          case 8:
+            listData = [
+              {
+                type: 'warning',
+                content: 'This is warning event.',
+              },
+              {
+                type: 'success',
+                content: 'This is usual event.',
+              },
+            ];
+            break;
+          case 10:
+            listData = [
+              {
+                type: 'warning',
+                content: 'This is warning event.',
+              },
+              {
+                type: 'success',
+                content: 'This is usual event.',
+              },
+              {
+                type: 'error',
+                content: 'This is error event.',
+              },
+            ];
+            break;
+          case 15:
+            listData = [
+              {
+                type: 'warning',
+                content: 'This is warning event',
+              },
+              {
+                type: 'success',
+                content: 'This is very long usual event。。....',
+              },
+              {
+                type: 'error',
+                content: 'This is error event 1.',
+              },
+              {
+                type: 'error',
+                content: 'This is error event 2.',
+              },
+              {
+                type: 'error',
+                content: 'This is error event 3.',
+              },
+              {
+                type: 'error',
+                content: 'This is error event 4.',
+              },
+            ];
+            break;
+          default:
+        }
+        return listData || [];
+      };
+      const getMonthData = (value) => {
+        if (value.month() === 8) {
+          return 1394;
+        }
+      };
+    
+
+
+
+    if (employee) {
+        calculateAnnual(employee._id)
+        calculateSick(employee._id)
+
+    }
     useEffect(() => {
         loadMoreData();
     }, []);
@@ -237,7 +400,8 @@ const Manager = () => {
 
             </div>
             <div>
-                {employee && <div className='emplyoeeProfile'> <Descriptions title={`${employee.name}'s Profile`} layout="vertical" bordered={true}>
+                {employee && <div className='emplyoeeProfile'> 
+                    <Descriptions title={`${employee.name}'s Profile`} layout="vertical" bordered={true}>
                     <Descriptions.Item label="Name">{employee.name}</Descriptions.Item>
                     <Descriptions.Item label="Employee ID">{employee.employeeId}</Descriptions.Item>
                     <Descriptions.Item label="Phone Number">{employee.phoneNumber}</Descriptions.Item>
@@ -291,19 +455,55 @@ const Manager = () => {
 
                     </Descriptions.Item>
                     <Descriptions.Item label="Schedule">
-                        <button>Edit Schedule</button>
-                        <button>Show Schedule</button>
+                        <button onClick={showModal}>Edit Schedule</button>
+
+
+                        <Modal title="Set Schedule" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+                            <Space direction="vertical" size={12}>
+                                <DatePicker
+                                    presets={[
+                                        {
+                                            label: 'Yesterday',
+                                            value: dayjs().add(-1, 'd'),
+                                        },
+                                        {
+                                            label: 'Last Week',
+                                            value: dayjs().add(-7, 'd'),
+                                        },
+                                        {
+                                            label: 'Last Month',
+                                            value: dayjs().add(-1, 'month'),
+                                        },
+                                    ]}
+                                    onChange={onChange}
+                                />
+                                <RangePicker presets={rangePresets} onChange={onRangeChange} />
+                                <RangePicker
+                                    presets={rangePresets}
+                                    showTime
+                                    format="YYYY/MM/DD HH:mm:ss"
+                                    onChange={onRangeChange}
+                                />
+                            </Space>
+                        </Modal>
+
+
+                        <button onClick={showModalShow}>Show Schedule</button>
+                        <Modal title="test" open={isMpdalOpen_2} onOk={handleShowOk} onCancel={handleCancel}>
+
+
+                        </Modal>
 
                     </Descriptions.Item>
                     <Descriptions.Item label="Attendence">
                         <div>
                             <input type="checkbox" id="start" name="start" ></input>
-                            <label for="start">Start</label>
+                            <label >Start</label>
                         </div>
 
                         <div>
                             <input type="checkbox" id="end" name="end"></input>
-                            <label for="end">End</label>
+                            <label >End</label>
                         </div>
 
                     </Descriptions.Item>
