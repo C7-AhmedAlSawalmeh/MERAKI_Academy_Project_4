@@ -7,7 +7,7 @@ const authorization = require("../middleware/authorization");
 const scheduleRouter = express.Router();
 
 scheduleRouter.post("/:id",authentication,authorization("DoEveryThing") ,createSchedule)
-scheduleRouter.put("/update/:id",authentication,authorization("DoEveryThing") ,updateScheduleById)
+scheduleRouter.delete("/update/:id",authentication,authorization("DoEveryThing") ,updateScheduleById)
 
 
 module.exports = scheduleRouter

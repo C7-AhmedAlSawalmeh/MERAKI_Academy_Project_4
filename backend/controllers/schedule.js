@@ -46,7 +46,7 @@ const updateScheduleById = (req, res) => {
     const id = req.params.id
     const update = req.body
     scheduleModel
-        .findByIdAndUpdate({ _id: id }, update, { new: true })
+        .findByIdAndDelete({ _id: id },  { new: true })
         .then((result) => {
             if (!result) {
                 return res.status(403).json({
@@ -54,7 +54,7 @@ const updateScheduleById = (req, res) => {
                     message: "Wrong call"
                 })
             }
-            res.sataus(202).json({
+            res.status(202).json({
                 success: true,
                 message: "Schedule updated",
                 schedule: result

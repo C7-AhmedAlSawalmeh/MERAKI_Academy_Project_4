@@ -10,27 +10,38 @@ import axios from 'axios';
 import { Data } from "../../App"
 import { WeeklyCalendar, } from 'antd-weekly-calendar';
 import "./Manager.css"
-import Employee from '../EmployeePage/Employee';
-import DescriptionsItem from 'antd/es/descriptions/Item';
+
 const { RangePicker } = DatePicker;
 
 
 const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const items = [
     {
-        key: '1',
-        label: 'Item 1',
+        key: 'Work',
+        label: 'Work',
     },
     {
-        key: '2',
-        label: 'Item 2',
+        key: 'Meeting',
+        label: 'Meeting',
     },
     {
-        key: '3',
-        label: 'Item 3',
+        key: 'OFF',
+        label: 'OFF',
+    },
+    {
+        key: 'Annual',
+        label: 'Annual',
+    },
+    {
+        key: 'Sick',
+        label: 'Sick',
+    },
+    {
+        key: 'Break',
+        label: 'Break',
     },
 ];
-
+let events = [];
 const Manager = () => {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
@@ -46,6 +57,7 @@ const Manager = () => {
     const [selectStartDay, setSelectStartDay] = useState("")
     const [selectEndDay, setSelectEndDay] = useState("")
     const [workActivity, setWorkActivity] = useState("Work")
+    const [renderActivity, setRenderActivity] = useState(true)
 
 
     const { RangePicker } = DatePicker;
@@ -183,14 +195,14 @@ const Manager = () => {
                     Authorization: `Bearer ${token}`
                 }
             })
-            
+
             const newData = data.map((elem, i) => {
 
                 if (elem._id == employee._id) {
                     const result = employee.hr_actions.filter((elem, i) => {
                         return elem._id != id
                     })
-                    
+
                     elem.hr_actions = result
                     employee.hr_actions = elem.hr_actions
                     setEmployee(data[i])
@@ -201,7 +213,7 @@ const Manager = () => {
                 }
             })
             setData(newData)
-            
+
 
 
         } catch (err) {
@@ -215,10 +227,7 @@ const Manager = () => {
     //handle ok for the first Modal ||-----------------------------------------------------------||
     const handleOk = async () => {
         let day = new Date(selectStartDay)
-        let work = "Work"
-        if (weekday[day.getDay()] === "Friday" || weekday[day.getDay()] == "Saturday") {
-            work = "OFF"
-        }
+
         const schedule = {
 
             employee_id: employee._id,
@@ -227,7 +236,7 @@ const Manager = () => {
                 start_time: selectStartDay,
                 end_time: selectEndDay,
                 hours: 8,
-                isWork: work
+                isWork: workActivity
             }
         }
         try {
@@ -236,25 +245,84 @@ const Manager = () => {
                     Authorization: `Bearer ${token}`
                 }
             })
-            employee.schedule.push(schedule)
-            
+            const newData = data.map((elem, i) => {
+
+                if (elem._id == employee._id) {
+                    elem.schedule.push(response.data.schedule)
+                    employee.schedule.push(response.data.schedule)
+                    console.log(employee.schedule)
+                    if (employee?.schedule?.length) {
+                        const loopSchedule = () => {
+
+                            if (renderActivity) {
+                                events = []
+                                employee.schedule.forEach((elem, i) => {
+                                    let color;
+
+                                    if (elem.work_days.isWork == "Work") {
+                                        color = "blue"
+                                    }
+                                    if (elem.work_days.isWork == "Meeting") {
+                                        color = "orange"
+                                    }
+                                    if (elem.work_days.isWork == "OFF") {
+                                        color = "grey"
+                                    }
+                                    if (elem.work_days.isWork == "Annual") {
+                                        color = "cornflowerblue"
+                                    }
+                                    if (elem.work_days.isWork == "Sick") {
+                                        color = "red"
+                                    }
+                                    if (elem.work_days.isWork == "Break") {
+                                        color = "yellow"
+                                    }
+
+                                    events.push({ startTime: new Date(elem.work_days.start_time), endTime: new Date(elem.work_days.end_time), title: elem.work_days.isWork, backgroundColor: color, id: elem._id })
+
+                                    console.log(events)
+                                    console.log(employee.schedule)
+                                    setRenderActivity(false)
+
+                                })
+
+                                setRenderActivity(false)
+                            }
+
+                        }
+                        loopSchedule()
+                    }
+                    //    setEmployee(data[i])
+                    return elem
+                }
+                else {
+                    return elem
+                }
+            })
+
+            setData(newData)
+
+
+
         } catch (err) {
             console.log(err)
         }
         setIsModalOpen(false);
+        setRenderActivity(true)
 
     };
+
     //handle cencel for both modals ||-----------------------------------------------------------||
     const handleCancel = () => {
         setIsModalOpen(false);
         setIsMpdalOpen_2(false)
     };
 
-    
+
     // Handle the change on date in the date Picker||-----------------------------------------------------------||
     const onRangeChange = (dates, dateStrings) => {
         if (dates) {
-           
+
             setSelectStartDay(dateStrings[0])
             setSelectEndDay(dateStrings[1])
         } else {
@@ -291,32 +359,58 @@ const Manager = () => {
     }
 
 
-    const events = [];
-    if (employee) {
-        const loopSchedule = () => {
 
-            employee.schedule.forEach((elem, i) => {
-                let color = "blue"
-                
-                if (elem.work_days.day == "Friday" || elem.work_days.day == "Saturday") {
-                    color = "red"
-                }
-                events.push({ startTime: new Date(elem.work_days.start_time), endTime: new Date(elem.work_days.end_time), title: elem.work_days.isWork, backgroundColor: color })
-            })
+
+
+    const deleteActivity = async (id) => {
+        const employee = {
+
         }
-        loopSchedule()
+        try {
+            const response = await axios.delete(`http://localhost:5000/schedule/update/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            const newData = data.map((elem, i) => {
+
+                if (elem._id == employee._id) {
+                    const result = employee.schedule.filter((elem, i) => {
+                        return elem._id != id
+                    })
+
+                    elem.schedule = result
+                    employee.schedule = elem.schedule
+                    setEmployee(data[i])
+                    return elem
+                }
+                else {
+                    return elem
+                }
+            })
+            setData(newData)
+            console.log(events)
+            const newResult = events.filter((elem, i) => {
+                return elem.id != id
+            })
+            events = newResult
+            console.log(newResult)
+        } catch (err) {
+            console.log(err)
+        }
+
+
+
     }
-
-
 
     if (employee) {
         calculateAnnual(employee._id)
         calculateSick(employee._id)
 
     }
-const onClick = ({key})=>{
-    console.log(`Click on item ${key}`)
-}
+    const onClick = ({ key }) => {
+        setWorkActivity(key)
+    }
 
     useEffect(() => {
         loadMoreData();
@@ -399,7 +493,7 @@ const onClick = ({key})=>{
                                 setValueOfSalary(e.target.value)
 
                             }}></input>}
-                            <p>{employee.salary.hourly_salary * 8}JOD</p>
+                            <p>{employee?.salary?.hourly_salary * 8}JOD</p>
                         </Descriptions.Item>
                         <Descriptions.Item label="HR Actions" >
                             <button onClick={() => {
@@ -443,13 +537,13 @@ const onClick = ({key})=>{
                                         menu={{
                                             items,
                                             selectable: true,
-                                            defaultSelectedKeys: ['5'],
+                                            defaultSelectedKeys: ['6'],
                                             onClick,
                                         }}
                                     >
                                         <Typography.Link>
                                             <Space>
-                                                Selectable
+                                                {workActivity}
                                                 <DownOutlined />
                                             </Space>
                                         </Typography.Link>
@@ -463,8 +557,8 @@ const onClick = ({key})=>{
                                 <>
                                     <WeeklyCalendar
                                         events={events}
-                                        onEventClick={(event) => console.log(event)}
-                                        onSelectDate={(date) => console.log(date)}
+                                        onEventClick={(event) => deleteActivity(event.id)}
+
                                         weekends="false"
                                     />
                                 </>
