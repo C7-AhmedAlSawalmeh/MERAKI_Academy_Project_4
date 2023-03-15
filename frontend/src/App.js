@@ -9,6 +9,7 @@ import React, { useState, createContext, useEffect } from "react"
 import Manager from "./components/Manager/Manager";
 import Register from "./components/Register/Register";
 import Employee from "./components/EmployeePage/Employee";
+import Test from "./Test";
 
 export const Data = createContext();
 
@@ -45,6 +46,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />}></Route>
           <Route path="/login" element={<Login />}></Route>
+          <Route path="/test" element={<Test/>}></Route>
           {token && <Route path="/managerPage" element={<Manager />}></Route>}
           {normalToken && <Route path="/employeePage" element={<Employee />}></Route>}
           {token &&<Route path="/register" element={<Register />}></Route>}

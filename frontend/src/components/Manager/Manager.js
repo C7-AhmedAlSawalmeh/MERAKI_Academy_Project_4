@@ -1,15 +1,36 @@
 import React from 'react'
 import "./Manager.css"
-import { Avatar, Divider, List, Skeleton, Descriptions, Badge, Button, Modal, DatePicker, Space , Calendar  } from 'antd';
+import { Avatar, Divider, List, Skeleton, Descriptions, Badge, Button, Modal, DatePicker, Space, Calendar, Typography, Dropdown } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+
 import dayjs from 'dayjs';
 import { useEffect, useState, useContext } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import axios from 'axios';
 import { Data } from "../../App"
+import { WeeklyCalendar, } from 'antd-weekly-calendar';
 import "./Manager.css"
 import Employee from '../EmployeePage/Employee';
 import DescriptionsItem from 'antd/es/descriptions/Item';
 const { RangePicker } = DatePicker;
+
+
+const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const items = [
+    {
+        key: '1',
+        label: 'Item 1',
+    },
+    {
+        key: '2',
+        label: 'Item 2',
+    },
+    {
+        key: '3',
+        label: 'Item 3',
+    },
+];
+
 const Manager = () => {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
@@ -24,7 +45,12 @@ const Manager = () => {
     const [isMpdalOpen_2, setIsMpdalOpen_2] = useState(false)
     const [selectStartDay, setSelectStartDay] = useState("")
     const [selectEndDay, setSelectEndDay] = useState("")
+    const [workActivity, setWorkActivity] = useState("Work")
+
+
     const { RangePicker } = DatePicker;
+
+
 
 
     const { token, setToken } = useContext(Data)
@@ -157,14 +183,14 @@ const Manager = () => {
                     Authorization: `Bearer ${token}`
                 }
             })
-            console.log(response)
+            
             const newData = data.map((elem, i) => {
 
                 if (elem._id == employee._id) {
                     const result = employee.hr_actions.filter((elem, i) => {
                         return elem._id != id
                     })
-                    console.log(result)
+                    
                     elem.hr_actions = result
                     employee.hr_actions = elem.hr_actions
                     setEmployee(data[i])
@@ -175,12 +201,7 @@ const Manager = () => {
                 }
             })
             setData(newData)
-            // const newHRaction = employee.hr_actions.filter((elem,i)=>{
-            //     return elem._id != id
-            // })
-            // // setEmployee(newEmployee)
-            // console.log(employee.hr_actions)
-            // employee.hrAction=newHRaction
+            
 
 
         } catch (err) {
@@ -193,25 +214,33 @@ const Manager = () => {
     };
     //handle ok for the first Modal ||-----------------------------------------------------------||
     const handleOk = async () => {
+        let day = new Date(selectStartDay)
+        let work = "Work"
+        if (weekday[day.getDay()] === "Friday" || weekday[day.getDay()] == "Saturday") {
+            work = "OFF"
+        }
         const schedule = {
-            employee_id:employee._id,
-            work_days:{
-                start_time:selectStartDay,
-                end_time:selectEndDay,
-                hours:8,
-                isWork:true
+
+            employee_id: employee._id,
+            work_days: {
+                day: weekday[day.getDay()],
+                start_time: selectStartDay,
+                end_time: selectEndDay,
+                hours: 8,
+                isWork: work
             }
         }
-try{
-    const response = await axios.post(`http://localhost:5000/schedule/${employee._id}`,schedule,{
-        headers: {
-            Authorization: `Bearer ${token}`
+        try {
+            const response = await axios.post(`http://localhost:5000/schedule/${employee._id}`, schedule, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            employee.schedule.push(schedule)
+            
+        } catch (err) {
+            console.log(err)
         }
-    })
-    console.log(response)
-}catch(err){
-    console.log(err)
-}
         setIsModalOpen(false);
 
     };
@@ -221,19 +250,11 @@ try{
         setIsMpdalOpen_2(false)
     };
 
-    // Handle the change on date in the date Picker||-----------------------------------------------------------||
-    const onChange = (date) => {
-        if (date) {
-            console.log('Date: ', date);
-        } else {
-            console.log('Clear');
-        }
-    };
+    
     // Handle the change on date in the date Picker||-----------------------------------------------------------||
     const onRangeChange = (dates, dateStrings) => {
         if (dates) {
-            // console.log('From: ', dates[0], ', to: ', dates[1]);
-            // console.log('From: ', dateStrings[0], ', to: ', dateStrings[1]);
+           
             setSelectStartDay(dateStrings[0])
             setSelectEndDay(dateStrings[1])
         } else {
@@ -261,82 +282,30 @@ try{
     ];
 
     //handle ok for the 2nd Modal ||-----------------------------------------------------------||
-    const handleShowOk = ()=>{
+    const handleShowOk = () => {
         setIsMpdalOpen_2(false);
     }
     //Show 2nd Modal (Show One) ||-----------------------------------------------------------||
-    const showModalShow = ( ) =>{
+    const showModalShow = () => {
         setIsMpdalOpen_2(true)
     }
-    const getListData = (value) => {
-        let listData;
-        switch (value.date()) {
-          case 8:
-            listData = [
-              {
-                type: 'warning',
-                content: 'This is warning event.',
-              },
-              {
-                type: 'success',
-                content: 'This is usual event.',
-              },
-            ];
-            break;
-          case 10:
-            listData = [
-              {
-                type: 'warning',
-                content: 'This is warning event.',
-              },
-              {
-                type: 'success',
-                content: 'This is usual event.',
-              },
-              {
-                type: 'error',
-                content: 'This is error event.',
-              },
-            ];
-            break;
-          case 15:
-            listData = [
-              {
-                type: 'warning',
-                content: 'This is warning event',
-              },
-              {
-                type: 'success',
-                content: 'This is very long usual event。。....',
-              },
-              {
-                type: 'error',
-                content: 'This is error event 1.',
-              },
-              {
-                type: 'error',
-                content: 'This is error event 2.',
-              },
-              {
-                type: 'error',
-                content: 'This is error event 3.',
-              },
-              {
-                type: 'error',
-                content: 'This is error event 4.',
-              },
-            ];
-            break;
-          default:
+
+
+    const events = [];
+    if (employee) {
+        const loopSchedule = () => {
+
+            employee.schedule.forEach((elem, i) => {
+                let color = "blue"
+                
+                if (elem.work_days.day == "Friday" || elem.work_days.day == "Saturday") {
+                    color = "red"
+                }
+                events.push({ startTime: new Date(elem.work_days.start_time), endTime: new Date(elem.work_days.end_time), title: elem.work_days.isWork, backgroundColor: color })
+            })
         }
-        return listData || [];
-      };
-      const getMonthData = (value) => {
-        if (value.month() === 8) {
-          return 1394;
-        }
-      };
-    
+        loopSchedule()
+    }
 
 
 
@@ -345,6 +314,10 @@ try{
         calculateSick(employee._id)
 
     }
+const onClick = ({key})=>{
+    console.log(`Click on item ${key}`)
+}
+
     useEffect(() => {
         loadMoreData();
     }, []);
@@ -400,114 +373,118 @@ try{
 
             </div>
             <div>
-                {employee && <div className='emplyoeeProfile'> 
+                {employee && <div className='emplyoeeProfile'>
                     <Descriptions title={`${employee.name}'s Profile`} layout="vertical" bordered={true}>
-                    <Descriptions.Item label="Name">{employee.name}</Descriptions.Item>
-                    <Descriptions.Item label="Employee ID">{employee.employeeId}</Descriptions.Item>
-                    <Descriptions.Item label="Phone Number">{employee.phoneNumber}</Descriptions.Item>
-                    <Descriptions.Item label="Date of Entry">{employee.date}</Descriptions.Item>
-                    <Descriptions.Item label="Current Time" span={2}>
-                        {Date()}
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Status" span={3} >
+                        <Descriptions.Item label="Name">{employee.name}</Descriptions.Item>
+                        <Descriptions.Item label="Employee ID">{employee.employeeId}</Descriptions.Item>
+                        <Descriptions.Item label="Phone Number">{employee.phoneNumber}</Descriptions.Item>
+                        <Descriptions.Item label="Date of Entry">{employee.date}</Descriptions.Item>
+                        <Descriptions.Item label="Current Time" span={2}>
+                            {Date()}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Status" span={3} >
 
-                        <Badge status="processing" text="Active" />
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Annual Vacations">{employee.annual_vacations.annual_days}</Descriptions.Item>
-                    <Descriptions.Item label="Sick Vacations">{employee.sick_vacations.sick_days}</Descriptions.Item>
-                    <Descriptions.Item label="Salary"><button onClick={() => {
-                        setSalaryClickId(employee._id)
-                        setSalaryClicked(!salaryClicked)
-                        calculateSalary(employee._id)
+                            <Badge status="processing" text="Active" />
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Annual Vacations">{employee.annual_vacations.annual_days}</Descriptions.Item>
+                        <Descriptions.Item label="Sick Vacations">{employee.sick_vacations.sick_days}</Descriptions.Item>
+                        <Descriptions.Item label="Salary"><button onClick={() => {
+                            setSalaryClickId(employee._id)
+                            setSalaryClicked(!salaryClicked)
+                            calculateSalary(employee._id)
 
 
-                    }}>Edit Salary</button>
-                        {salaryClicked && salaryClickId === employee._id && <input placeholder="Hourly" onChange={(e) => {
-                            setValueOfSalary(e.target.value)
+                        }}>Edit Salary</button>
+                            {salaryClicked && salaryClickId === employee._id && <input placeholder="Hourly" onChange={(e) => {
+                                setValueOfSalary(e.target.value)
 
-                        }}></input>}
-                        <p>{employee.salary.hourly_salary * 8}JOD</p>
-                    </Descriptions.Item>
-                    <Descriptions.Item label="HR Actions" >
-                        <button onClick={() => {
+                            }}></input>}
+                            <p>{employee.salary.hourly_salary * 8}JOD</p>
+                        </Descriptions.Item>
+                        <Descriptions.Item label="HR Actions" >
+                            <button onClick={() => {
 
-                            setHrBtnClicked(!HrBtnClicked)
-                            setHrIdClick(employee._id)
-                            handleHRclick(employee._id)
-                        }}>Add HR action</button>
-                        {HrBtnClicked && employee._id == hrIdClick && <input placeholder='Put the reason here' onChange={(e) => {
-                            setHrAction(e.target.value)
-                        }}></input>}
-                        <br />
-                        {employee.hr_actions.map((elem, i) => {
-                            return <div key={i}>
-                                <p>{elem.reason}</p>
-                                <button onClick={() => {
-                                    handleDeleteHR(elem._id)
-                                }}>Delete HR</button>
+                                setHrBtnClicked(!HrBtnClicked)
+                                setHrIdClick(employee._id)
+                                handleHRclick(employee._id)
+                            }}>Add HR action</button>
+                            {HrBtnClicked && employee._id == hrIdClick && <input placeholder='Put the reason here' onChange={(e) => {
+                                setHrAction(e.target.value)
+                            }}></input>}
+                            <br />
+                            {employee.hr_actions.map((elem, i) => {
+                                return <div key={i}>
+                                    <p>{elem.reason}</p>
+                                    <button onClick={() => {
+                                        handleDeleteHR(elem._id)
+                                    }}>Delete HR</button>
+                                </div>
+
+                            })}
+
+                            <br />
+
+
+
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Schedule">
+                            <button onClick={showModal}>Edit Schedule</button>
+
+
+                            <Modal title="Set Schedule" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+                                <Space direction="vertical" size={12}>
+                                    <RangePicker
+                                        presets={rangePresets}
+                                        showTime
+                                        format=" YYYY/MM/DD HH:mm:ss"
+                                        onChange={onRangeChange}
+                                    />
+                                    <Dropdown
+                                        menu={{
+                                            items,
+                                            selectable: true,
+                                            defaultSelectedKeys: ['5'],
+                                            onClick,
+                                        }}
+                                    >
+                                        <Typography.Link>
+                                            <Space>
+                                                Selectable
+                                                <DownOutlined />
+                                            </Space>
+                                        </Typography.Link>
+                                    </Dropdown>
+                                </Space>
+                            </Modal>
+
+
+                            <button onClick={showModalShow}>Show Schedule</button>
+                            <Modal title="test" open={isMpdalOpen_2} onOk={handleShowOk} onCancel={handleCancel} width={1000}>
+                                <>
+                                    <WeeklyCalendar
+                                        events={events}
+                                        onEventClick={(event) => console.log(event)}
+                                        onSelectDate={(date) => console.log(date)}
+                                        weekends="false"
+                                    />
+                                </>
+
+                            </Modal>
+
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Attendence">
+                            <div>
+                                <input type="checkbox" id="start" name="start" ></input>
+                                <label >Start</label>
                             </div>
 
-                        })}
+                            <div>
+                                <input type="checkbox" id="end" name="end"></input>
+                                <label >End</label>
+                            </div>
 
-                        <br />
-                        Database version: 3.4
-                        <br />
-
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Schedule">
-                        <button onClick={showModal}>Edit Schedule</button>
-
-
-                        <Modal title="Set Schedule" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-                            <Space direction="vertical" size={12}>
-                                <DatePicker
-                                    presets={[
-                                        {
-                                            label: 'Yesterday',
-                                            value: dayjs().add(-1, 'd'),
-                                        },
-                                        {
-                                            label: 'Last Week',
-                                            value: dayjs().add(-7, 'd'),
-                                        },
-                                        {
-                                            label: 'Last Month',
-                                            value: dayjs().add(-1, 'month'),
-                                        },
-                                    ]}
-                                    onChange={onChange}
-                                />
-                                <RangePicker presets={rangePresets} onChange={onRangeChange} />
-                                <RangePicker
-                                    presets={rangePresets}
-                                    showTime
-                                    format="YYYY/MM/DD HH:mm:ss"
-                                    onChange={onRangeChange}
-                                />
-                            </Space>
-                        </Modal>
-
-
-                        <button onClick={showModalShow}>Show Schedule</button>
-                        <Modal title="test" open={isMpdalOpen_2} onOk={handleShowOk} onCancel={handleCancel}>
-
-
-                        </Modal>
-
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Attendence">
-                        <div>
-                            <input type="checkbox" id="start" name="start" ></input>
-                            <label >Start</label>
-                        </div>
-
-                        <div>
-                            <input type="checkbox" id="end" name="end"></input>
-                            <label >End</label>
-                        </div>
-
-                    </Descriptions.Item>
-                </Descriptions>
+                        </Descriptions.Item>
+                    </Descriptions>
                 </div>}
 
             </div>
@@ -515,4 +492,6 @@ try{
     )
 }
 
+
 export default Manager
+// format="YYYY/MM/DD HH:mm:ss"
