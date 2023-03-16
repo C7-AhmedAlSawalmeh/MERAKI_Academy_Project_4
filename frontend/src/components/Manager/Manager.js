@@ -58,13 +58,16 @@ const Manager = () => {
     const [selectEndDay, setSelectEndDay] = useState("")
     const [workActivity, setWorkActivity] = useState("Work")
     const [renderActivity, setRenderActivity] = useState(true)
+    const [checkBoxed, setCheckBoxed] = useState(false)
+    const [attendeceData, setAttendeceData] = useState([])
+    const [attendeceCondition, setattendeceCondition] = useState(true)
+    const [attendenceFunctionConditionV, setAttendenceFunctionConditionV] = useState(false)
+
+
+
 
 
     const { RangePicker } = DatePicker;
-
-
-
-
     const { token, setToken } = useContext(Data)
     // Call all the data ||-----------------------------------------------------------||
     const loadMoreData = async () => {
@@ -224,10 +227,12 @@ const Manager = () => {
     const showModal = () => {
         setIsModalOpen(true);
     };
-    //handle ok for the first Modal ||-----------------------------------------------------------||
+    //handle ok for the first Modal and creat a schedule ||-----------------------------------------------------------||
     const handleOk = async () => {
         let day = new Date(selectStartDay)
-
+        const start = new Date(selectStartDay)
+        const end = new Date(selectEndDay)
+        const hours = (end - start) / (1000 * 60 * 60)
         const schedule = {
 
             employee_id: employee._id,
@@ -235,7 +240,7 @@ const Manager = () => {
                 day: weekday[day.getDay()],
                 start_time: selectStartDay,
                 end_time: selectEndDay,
-                hours: 8,
+                hours: hours,
                 isWork: workActivity
             }
         }
@@ -275,10 +280,10 @@ const Manager = () => {
                                         color = "red"
                                     }
                                     if (elem.work_days.isWork == "Break") {
-                                        color = "yellow"
+                                        color = "black"
                                     }
 
-                                    events.push({ startTime: new Date(elem.work_days.start_time), endTime: new Date(elem.work_days.end_time), title: elem.work_days.isWork, backgroundColor: color, id: elem._id })
+                                    events.push({ startTime: new Date(elem.work_days.start_time), endTime: new Date(elem.work_days.end_time), title: `${elem.work_days.isWork} (${elem.work_days.hours}) hours`, backgroundColor: color, id: elem._id })
 
                                     console.log(events)
                                     console.log(employee.schedule)
@@ -318,7 +323,6 @@ const Manager = () => {
         setIsMpdalOpen_2(false)
     };
 
-
     // Handle the change on date in the date Picker||-----------------------------------------------------------||
     const onRangeChange = (dates, dateStrings) => {
         if (dates) {
@@ -357,11 +361,7 @@ const Manager = () => {
     const showModalShow = () => {
         setIsMpdalOpen_2(true)
     }
-
-
-
-
-
+    //Delete an event on the schdule ||-----------------------------------------------------------||
     const deleteActivity = async (id) => {
         const employee = {
 
@@ -380,7 +380,9 @@ const Manager = () => {
                     })
 
                     elem.schedule = result
+                    console.log(employee.schedule)
                     employee.schedule = elem.schedule
+                    console.log(employee.schedule)
                     setEmployee(data[i])
                     return elem
                 }
@@ -402,18 +404,91 @@ const Manager = () => {
 
 
     }
-
+    //Call for the employee Data ||-----------------------------------------------------------||
     if (employee) {
         calculateAnnual(employee._id)
         calculateSick(employee._id)
 
     }
+    //for the DropDown list ||-----------------------------------------------------------||
     const onClick = ({ key }) => {
         setWorkActivity(key)
     }
+    // for start attendence  ||-----------------------------------------------------------||
+    const attendenceStart = async (id) => {
+        const attendence = {
+            employee_id: id
+        }
+        try {
+            const response = await axios.post("http://localhost:5000/attendence", attendence, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            setAttendenceFunctionConditionV(true)
+        }
+
+        catch (err) {
+            console.log(err)
+        }
+
+
+    }
+    //for End attendence ||-----------------------------------------------------------||
+    const attendenceEnd = async (id) => {
+        try {
+            const response = await axios.put(`http://localhost:5000/attendence/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            console.log(response)
+        } catch (err) {
+            console.log(err)
+        }
+
+
+    }
+
+    //Calling the attendence data ||-----------------------------------------------------------||
+    if (employee && attendeceCondition) {
+        const callAttendence = async (id) => {
+            try {
+                const response = await axios.get(`http://localhost:5000/attendence/get/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+                setAttendeceData(response.data.result)
+                console.log(response)
+            } catch (err) {
+                console.log(err)
+            }
+
+        }
+        callAttendence(employee._id)
+        setattendeceCondition(false)
+    }
+
+    const attendenceFunctionCondition = () => {
+        if (!checkBoxed) {
+            if (attendeceData[0]?.employee_id == employee._id) {
+                if ((new Date() - new Date(attendeceData[attendeceData.length - 1]?.start_time)) / (1000 * 60 * 60 * 24) < 1) {
+                    setAttendenceFunctionConditionV(true)
+                } else {
+                    setAttendenceFunctionConditionV(false)
+                }
+            }
+        }
+        setCheckBoxed(true)
+    }
+
+    attendenceFunctionCondition()
 
     useEffect(() => {
         loadMoreData();
+
+
     }, []);
 
     return (
@@ -568,13 +643,24 @@ const Manager = () => {
                         </Descriptions.Item>
                         <Descriptions.Item label="Attendence">
                             <div>
-                                <input type="checkbox" id="start" name="start" ></input>
+                                <input type="checkbox" id="start" name="start" checked={attendenceFunctionConditionV} onClick={() => {
+                                   
+                                    attendenceStart(employee._id)
+                                }} ></input>
                                 <label >Start</label>
                             </div>
 
                             <div>
-                                <input type="checkbox" id="end" name="end"></input>
+                                <input type="checkbox" id="end" name="end" onClick={() => {
+                                    
+                                    attendenceEnd(attendeceData[attendeceData.length - 1]._id)
+                                }}></input>
                                 <label >End</label>
+                            </div>
+                            <div>
+                                <button onClick={() => {
+                                    //callAttendence(employee._id)
+                                }}>Show Data</button>
                             </div>
 
                         </Descriptions.Item>

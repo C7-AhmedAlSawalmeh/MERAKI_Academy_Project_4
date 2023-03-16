@@ -33,7 +33,7 @@ attendenceModel
     {end_time:currentDate}
     ,{new:true}
     ).then((result)=>{
-        res.status(203).json({
+        res.status(200).json({
             sucsses:true,
             message:"Attendence confirmed",
             start_time:result.start_time,
@@ -48,8 +48,35 @@ attendenceModel
     })
 }
 
+const getAttendenceByEmplyoeeId = (req,res)=>{
+    const id = req.params.id
+    attendenceModel
+    .find({employee_id:id})
+    .then((result)=>{
+        if(!result){
+            res.status(403).json({
+                sucsses:false,
+                message:"Wrong Call"
+
+            })
+        }
+        res.status(200).json({
+            sucsses:true,
+            message:"Founded",
+            result:result
+        })
+    }).catch((err)=>{
+        res.status(500).json({
+            sucsses:true,
+            message:"Server Error",
+            err:err.message
+        })
+    })
+}
+
 
 module.exports ={
     confirmStartAttendence,
-    confirmEndAttendence
+    confirmEndAttendence,
+    getAttendenceByEmplyoeeId
 }
