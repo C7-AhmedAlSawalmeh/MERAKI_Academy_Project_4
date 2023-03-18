@@ -63,6 +63,7 @@ const Manager = () => {
     const [attendeceCondition, setattendeceCondition] = useState(true)
     const [attendenceFunctionConditionV, setAttendenceFunctionConditionV] = useState(false)
     const [employeeAttendence, setEmployeeAttendence] = useState("")
+    const [test, setTest] = useState("")
     
 
 
@@ -83,8 +84,10 @@ const Manager = () => {
                     Authorization: `Bearer ${token}`
                 }
             })
-
+            setTest(response.data.employeeId)
             setData(response.data.employees)
+            console.log(test)
+            console.log(response.data)
             setLoading(false);
 
         } catch (err) {

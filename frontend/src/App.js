@@ -37,7 +37,8 @@ function App() {
   }
   useEffect(() => {
     setToken(tokenFromLocal)
-  }, [token])
+    setNormalToken(normalTokenFromLocal)
+  }, [token,normalToken])
   return (
     <Data.Provider value={providerDate} >
       <div className="App">

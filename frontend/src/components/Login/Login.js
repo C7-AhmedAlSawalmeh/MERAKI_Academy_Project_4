@@ -29,6 +29,7 @@ const Login = () => {
             if (response.data.role.permissions[0]== "DoEveryThing"){
                 localStorage.setItem("token",response.data.token)
                 setToken(response.data.token)
+                console.log(response)
                 navigate("/managerPage")
                 setManagerLogged(true)
             }

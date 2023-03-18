@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken")
 
 
 const getAllEmployees = (req, res) => {
-
+const employeeId = req.token.employeeId
     employeeModel
         .find()
         .populate("annual_vacations sick_vacations role schedule salary hr_actions")
@@ -14,7 +14,8 @@ const getAllEmployees = (req, res) => {
                 res.status(200).json({
                     sucsses: true,
                     message: "All employees",
-                    employees: employees
+                    employees: employees,
+                    emplyoeeId:employeeId
                 })
             } else {
                 res.status(200).json({
@@ -184,8 +185,8 @@ const login = (req, res) => {
                     })
                 }
                 const payload = {
-                    employeeid: result.employeeId,
-                    employeeName: result.Name,
+                    employeeId: result.employeeId,
+                    employeeName: result.name,
                     role: result.role,
                     phoneNumber: result.phoneNumber
                 }
@@ -197,7 +198,8 @@ const login = (req, res) => {
                     sucsses: true,
                     message: "Welcome",
                     token: token,
-                    role: result.role
+                    role: result.role,
+                    emplyoeeId:result.employeeId
                 })
 
             } catch (err) {
