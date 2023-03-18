@@ -62,6 +62,8 @@ const Manager = () => {
     const [attendeceData, setAttendeceData] = useState([])
     const [attendeceCondition, setattendeceCondition] = useState(true)
     const [attendenceFunctionConditionV, setAttendenceFunctionConditionV] = useState(false)
+    const [employeeAttendence, setEmployeeAttendence] = useState("")
+    
 
 
 
@@ -99,6 +101,7 @@ const Manager = () => {
                 }
             })
             setEmployee(response.data.employee)
+            setattendeceCondition(true)
 
 
 
@@ -426,6 +429,8 @@ const Manager = () => {
                 }
             })
             setAttendenceFunctionConditionV(true)
+            setEmployeeAttendence(response.data.attendence)
+            console.log(response)
         }
 
         catch (err) {
@@ -442,7 +447,8 @@ const Manager = () => {
                     Authorization: `Bearer ${token}`
                 }
             })
-            console.log(response)
+            setAttendenceFunctionConditionV(true)
+            setEmployeeAttendence(response.data.attendence)
         } catch (err) {
             console.log(err)
         }
@@ -450,7 +456,7 @@ const Manager = () => {
 
     }
 
-    //Calling the attendence data ||-----------------------------------------------------------||
+    //Calling the attendence data by employee id ||-----------------------------------------------------------||
     if (employee && attendeceCondition) {
         const callAttendence = async (id) => {
             try {
@@ -460,6 +466,8 @@ const Manager = () => {
                     }
                 })
                 setAttendeceData(response.data.result)
+                setEmployeeAttendence(response.data.result[0])
+                setCheckBoxed(true)
                 console.log(response)
             } catch (err) {
                 console.log(err)
@@ -469,9 +477,10 @@ const Manager = () => {
         callAttendence(employee._id)
         setattendeceCondition(false)
     }
+    //The condition for the check box will be checked or not ||-----------------------------------------------------------||
+    if (checkBoxed) {
+        const attendenceFunctionCondition = () => {
 
-    const attendenceFunctionCondition = () => {
-        if (!checkBoxed) {
             if (attendeceData[0]?.employee_id == employee._id) {
                 if ((new Date() - new Date(attendeceData[attendeceData.length - 1]?.start_time)) / (1000 * 60 * 60 * 24) < 1) {
                     setAttendenceFunctionConditionV(true)
@@ -479,11 +488,13 @@ const Manager = () => {
                     setAttendenceFunctionConditionV(false)
                 }
             }
+
+
         }
-        setCheckBoxed(true)
+        setCheckBoxed(false)
+        attendenceFunctionCondition()
     }
 
-    attendenceFunctionCondition()
 
     useEffect(() => {
         loadMoreData();
@@ -643,16 +654,16 @@ const Manager = () => {
                         </Descriptions.Item>
                         <Descriptions.Item label="Attendence">
                             <div>
-                                <input type="checkbox" id="start" name="start" checked={attendenceFunctionConditionV} onClick={() => {
-                                   
+                                <input type="checkbox" id="start" name="start" checked={employeeAttendence?.employee_id == employee._id && attendenceFunctionConditionV} disabled={employeeAttendence?.employee_id == employee._id && attendenceFunctionConditionV} onClick={() => {
+
                                     attendenceStart(employee._id)
                                 }} ></input>
                                 <label >Start</label>
                             </div>
 
                             <div>
-                                <input type="checkbox" id="end" name="end" onClick={() => {
-                                    
+                                <input type="checkbox" id="end" name="end" checked={attendeceData[attendeceData.length - 1]?.end_time&&employeeAttendence?.employee_id == employee._id && attendenceFunctionConditionV} disabled= {attendeceData[attendeceData.length - 1]?.end_time&&employeeAttendence?.employee_id == employee._id && attendenceFunctionConditionV}onClick={() => {
+
                                     attendenceEnd(attendeceData[attendeceData.length - 1]._id)
                                 }}></input>
                                 <label >End</label>

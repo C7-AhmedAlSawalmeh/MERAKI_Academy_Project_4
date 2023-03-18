@@ -13,7 +13,7 @@ newAttendence
 res.status(201).json({
     sucsses:true,
     message:"Attendence Confirmed",
-    attendence:result.start_time
+    attendence:result
 })
 }).catch((err)=>{
     res.status(500).json({
@@ -36,8 +36,7 @@ attendenceModel
         res.status(200).json({
             sucsses:true,
             message:"Attendence confirmed",
-            start_time:result.start_time,
-            end_time:result.end_time
+            attendence:result
         })
     }).catch((err)=>{
         res.status(500).json({
