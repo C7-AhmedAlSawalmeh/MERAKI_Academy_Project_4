@@ -54,6 +54,7 @@ const Manager = () => {
     const [hrAction, setHrAction] = useState('')
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [isMpdalOpen_2, setIsMpdalOpen_2] = useState(false)
+    const [isModalOpen3, setIsModalOpen3] = useState(false)
     const [selectStartDay, setSelectStartDay] = useState("")
     const [selectEndDay, setSelectEndDay] = useState("")
     const [workActivity, setWorkActivity] = useState("Work")
@@ -63,8 +64,9 @@ const Manager = () => {
     const [attendeceCondition, setattendeceCondition] = useState(true)
     const [attendenceFunctionConditionV, setAttendenceFunctionConditionV] = useState(false)
     const [employeeAttendence, setEmployeeAttendence] = useState("")
+    const [searchQuery, setSearchQuery] = useState("");
     const [test, setTest] = useState("")
-    
+
 
 
 
@@ -94,6 +96,11 @@ const Manager = () => {
             console.log(err)
         }
     };
+    const filteredData = data.filter(
+        (employee) =>
+            employee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            employee.email.toLowerCase().includes(searchQuery.toLowerCase()) 
+    );
     // Show Data for specific employee ||---------------------------------||
     const handleClickName = async (employeeId) => {
 
@@ -327,6 +334,7 @@ const Manager = () => {
     const handleCancel = () => {
         setIsModalOpen(false);
         setIsMpdalOpen_2(false)
+        setIsModalOpen3(false);
     };
 
     // Handle the change on date in the date Picker||-----------------------------------------------------------||
@@ -458,7 +466,12 @@ const Manager = () => {
 
 
     }
-
+    const handleDataOk = () => {
+        setIsModalOpen3(false);
+    }
+    const showModalData = () => {
+        setIsModalOpen3(true)
+    }
     //Calling the attendence data by employee id ||-----------------------------------------------------------||
     if (employee && attendeceCondition) {
         const callAttendence = async (id) => {
@@ -469,6 +482,7 @@ const Manager = () => {
                     }
                 })
                 setAttendeceData(response.data.result)
+
                 setEmployeeAttendence(response.data.result[0])
                 setCheckBoxed(true)
                 console.log(response)
@@ -506,183 +520,197 @@ const Manager = () => {
     }, []);
 
     return (
-        <div className='managerPage'>
-            <div
-                id="scrollableDiv"
-                style={{
-                    width: 350,
-                    height: "100vh",
-                    overflow: 'auto',
-                    padding: '0 16px',
-                    border: '1px solid rgba(140, 140, 140, 0.35)',
-                }}
-            >
-                <InfiniteScroll
-                    dataLength={data.length}
-                    next={loadMoreData}
-                    hasMore={data.length < 1}
-                    loader={
-                        <Skeleton
-                            avatar
-                            paragraph={{
-                                rows: 1,
-                            }}
-                            active
-                        />
-                    }
-                    endMessage={<Divider plain>End ..</Divider>}
-                    scrollableTarget="scrollableDiv"
+        <>
+            <input
+                type="text"
+                className='SearchInput'
+                placeholder="Search employees..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)} />
+                <div
+                    id="scrollableDiv"
+                    style={{
+                        width: 350,
+                        height: "100vh",
+                        overflow: 'auto',
+                        padding: '0 16px',
+                        border: '1px solid rgba(140, 140, 140, 0.35)',
+                    }}
                 >
-                    <List
-                        dataSource={data}
-                        renderItem={(employee) => (
-                            <List.Item key={employee.email}>
-                                <List.Item.Meta
+                    <InfiniteScroll
+                        dataLength={data.length}
+                        next={loadMoreData}
+                        hasMore={data.length < 1}
+                        loader={
+                            <Skeleton
+                                avatar
+                                paragraph={{
+                                    rows: 1,
+                                }}
+                                active
+                            />
+                        }
+                        endMessage={<Divider plain>End ..</Divider>}
+                        scrollableTarget="scrollableDiv"
+                    >
+                        <List
+                            dataSource={filteredData}
+                            renderItem={(employee) => (
+                                <List.Item key={employee.email}>
+                                    <List.Item.Meta
 
-                                    title={<a onClick={() => {
-                                        handleClickName(employee._id)
+                                        title={<a onClick={() => {
+                                            handleClickName(employee._id)
 
-                                    }}>{employee.name}</a>}
+                                        }}>{employee.name}</a>}
 
-                                    description={employee.email}
+                                        description={employee.email}
 
-                                />
+                                    />
 
-                                <div>{employee.employeeId}</div>
-                            </List.Item>
-                        )}
-                    />
-                </InfiniteScroll>
+                                    <div>{employee.employeeId}</div>
+                                </List.Item>
+                            )}
+                        />
+                    </InfiniteScroll>
 
-            </div>
-            <div>
-                {employee && <div className='emplyoeeProfile'>
-                    <Descriptions title={`${employee.name}'s Profile`} layout="vertical" bordered={true}>
-                        <Descriptions.Item label="Name">{employee.name}</Descriptions.Item>
-                        <Descriptions.Item label="Employee ID">{employee.employeeId}</Descriptions.Item>
-                        <Descriptions.Item label="Phone Number">{employee.phoneNumber}</Descriptions.Item>
-                        <Descriptions.Item label="Date of Entry">{employee.date}</Descriptions.Item>
-                        <Descriptions.Item label="Current Time" span={2}>
-                            {Date()}
-                        </Descriptions.Item>
-                        <Descriptions.Item label="Status" span={3} >
-
-                            <Badge status="processing" text="Active" />
-                        </Descriptions.Item>
-                        <Descriptions.Item label="Annual Vacations">{employee.annual_vacations.annual_days}</Descriptions.Item>
-                        <Descriptions.Item label="Sick Vacations">{employee.sick_vacations.sick_days}</Descriptions.Item>
-                        <Descriptions.Item label="Salary"><button onClick={() => {
-                            setSalaryClickId(employee._id)
-                            setSalaryClicked(!salaryClicked)
-                            calculateSalary(employee._id)
+                </div>
+            <div className='managerPage'>
 
 
-                        }}>Edit Salary</button>
-                            {salaryClicked && salaryClickId === employee._id && <input placeholder="Hourly" onChange={(e) => {
-                                setValueOfSalary(e.target.value)
+                
+                <div>
+                    {employee && <div className='emplyoeeProfile'>
+                        <Descriptions title={`${employee.name}'s Profile`} layout="vertical" bordered={true}>
+                            <Descriptions.Item label="Name">{employee.name}</Descriptions.Item>
+                            <Descriptions.Item label="Employee ID">{employee.employeeId}</Descriptions.Item>
+                            <Descriptions.Item label="Phone Number">{employee.phoneNumber}</Descriptions.Item>
+                            <Descriptions.Item label="Date of Entry">{employee.date}</Descriptions.Item>
+                            <Descriptions.Item label="Current Time" span={2}>
+                                {Date()}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="Status" span={3} >
 
-                            }}></input>}
-                            <p>{employee?.salary?.hourly_salary * 8}JOD</p>
-                        </Descriptions.Item>
-                        <Descriptions.Item label="HR Actions" >
-                            <button onClick={() => {
+                                <Badge status="processing" text="Active" />
+                            </Descriptions.Item>
+                            <Descriptions.Item label="Annual Vacations">{employee.annual_vacations?.annual_days}</Descriptions.Item>
+                            <Descriptions.Item label="Sick Vacations">{employee.sick_vacations?.sick_days}</Descriptions.Item>
+                            <Descriptions.Item label="Salary"><button onClick={() => {
+                                setSalaryClickId(employee._id)
+                                setSalaryClicked(!salaryClicked)
+                                calculateSalary(employee._id)
 
-                                setHrBtnClicked(!HrBtnClicked)
-                                setHrIdClick(employee._id)
-                                handleHRclick(employee._id)
-                            }}>Add HR action</button>
-                            {HrBtnClicked && employee._id == hrIdClick && <input placeholder='Put the reason here' onChange={(e) => {
-                                setHrAction(e.target.value)
-                            }}></input>}
-                            <br />
-                            {employee.hr_actions.map((elem, i) => {
-                                return <div key={i}>
-                                    <p>{elem.reason}</p>
-                                    <button onClick={() => {
-                                        handleDeleteHR(elem._id)
-                                    }}>Delete HR</button>
+
+                            }}>Edit Salary</button>
+                                {salaryClicked && salaryClickId === employee._id && <input className='designInput' placeholder="Hourly" onChange={(e) => {
+                                    setValueOfSalary(e.target.value)
+
+                                }}></input>}
+                                <p>{employee?.salary?.hourly_salary * 8}JOD</p>
+                            </Descriptions.Item>
+                            <Descriptions.Item label="HR Actions" >
+                                <button onClick={() => {
+
+                                    setHrBtnClicked(!HrBtnClicked)
+                                    setHrIdClick(employee._id)
+                                    handleHRclick(employee._id)
+                                }}>Add HR action</button>
+                                {HrBtnClicked && employee._id == hrIdClick && <input className='designInput' placeholder='Put the reason here' onChange={(e) => {
+                                    setHrAction(e.target.value)
+                                }}></input>}
+                                <br />
+                                {employee.hr_actions.map((elem, i) => {
+                                    return <div key={i}>
+                                        <p>{elem.reason}</p>
+                                        <button onClick={() => {
+                                            handleDeleteHR(elem._id)
+                                        }}>X</button>
+                                    </div>
+
+                                })}
+
+                                <br />
+
+
+
+                            </Descriptions.Item>
+                            <Descriptions.Item label="Schedule">
+                                <button onClick={showModal}>Edit Schedule</button>
+
+
+                                <Modal title="Set Schedule" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+                                    <Space direction="vertical" size={12}>
+                                        <RangePicker
+                                            presets={rangePresets}
+                                            showTime
+                                            format=" YYYY/MM/DD HH:mm:ss"
+                                            onChange={onRangeChange}
+                                        />
+                                        <Dropdown
+                                            menu={{
+                                                items,
+                                                selectable: true,
+                                                defaultSelectedKeys: ['6'],
+                                                onClick,
+                                            }}
+                                        >
+                                            <Typography.Link>
+                                                <Space>
+                                                    {workActivity}
+                                                    <DownOutlined />
+                                                </Space>
+                                            </Typography.Link>
+                                        </Dropdown>
+                                    </Space>
+                                </Modal>
+
+
+                                <button onClick={showModalShow}>Show Schedule</button>
+                                <Modal title="Schedule" open={isMpdalOpen_2} onOk={handleShowOk} onCancel={handleCancel} width={1000}>
+                                    <>
+                                        <WeeklyCalendar
+                                            events={events}
+                                            onEventClick={(event) => deleteActivity(event.id)}
+
+                                            weekends="false"
+                                        />
+                                    </>
+
+                                </Modal>
+
+                            </Descriptions.Item>
+                            <Descriptions.Item label="Attendence">
+                                <div>
+                                    <input type="checkbox" id="start" name="start" checked={employeeAttendence?.employee_id == employee._id && attendenceFunctionConditionV} disabled={employeeAttendence?.employee_id == employee._id && attendenceFunctionConditionV} onClick={() => {
+
+                                        attendenceStart(employee._id)
+                                    }} ></input>
+                                    <label >Start</label>
                                 </div>
 
-                            })}
+                                <div>
+                                    <input type="checkbox" id="end" name="end" checked={attendeceData[attendeceData.length - 1]?.end_time && employeeAttendence?.employee_id == employee._id && attendenceFunctionConditionV} disabled={attendeceData[attendeceData.length - 1]?.end_time && employeeAttendence?.employee_id == employee._id && attendenceFunctionConditionV} onClick={() => {
 
-                            <br />
+                                        attendenceEnd(attendeceData[attendeceData.length - 1]._id)
+                                    }}></input>
+                                    <label >End</label>
+                                </div>
+                                <div>
+                                    <button onClick={showModalData}> Show Data</button>
+                                    <Modal title="Attendence Data" open={isModalOpen3} onOk={handleDataOk} onCancel={handleCancel}>
+                                        {attendeceData && <p>{attendeceData[attendeceData.length - 1]?.start_time}</p>}
+                                        {attendeceData && <p>{attendeceData[attendeceData.length - 1]?.end_time}</p>}
+                                    </Modal>
 
+                                </div>
 
+                            </Descriptions.Item>
+                        </Descriptions>
+                    </div>}
 
-                        </Descriptions.Item>
-                        <Descriptions.Item label="Schedule">
-                            <button onClick={showModal}>Edit Schedule</button>
-
-
-                            <Modal title="Set Schedule" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-                                <Space direction="vertical" size={12}>
-                                    <RangePicker
-                                        presets={rangePresets}
-                                        showTime
-                                        format=" YYYY/MM/DD HH:mm:ss"
-                                        onChange={onRangeChange}
-                                    />
-                                    <Dropdown
-                                        menu={{
-                                            items,
-                                            selectable: true,
-                                            defaultSelectedKeys: ['6'],
-                                            onClick,
-                                        }}
-                                    >
-                                        <Typography.Link>
-                                            <Space>
-                                                {workActivity}
-                                                <DownOutlined />
-                                            </Space>
-                                        </Typography.Link>
-                                    </Dropdown>
-                                </Space>
-                            </Modal>
-
-
-                            <button onClick={showModalShow}>Show Schedule</button>
-                            <Modal title="test" open={isMpdalOpen_2} onOk={handleShowOk} onCancel={handleCancel} width={1000}>
-                                <>
-                                    <WeeklyCalendar
-                                        events={events}
-                                        onEventClick={(event) => deleteActivity(event.id)}
-
-                                        weekends="false"
-                                    />
-                                </>
-
-                            </Modal>
-
-                        </Descriptions.Item>
-                        <Descriptions.Item label="Attendence">
-                            <div>
-                                <input type="checkbox" id="start" name="start" checked={employeeAttendence?.employee_id == employee._id && attendenceFunctionConditionV} disabled={employeeAttendence?.employee_id == employee._id && attendenceFunctionConditionV} onClick={() => {
-
-                                    attendenceStart(employee._id)
-                                }} ></input>
-                                <label >Start</label>
-                            </div>
-
-                            <div>
-                                <input type="checkbox" id="end" name="end" checked={attendeceData[attendeceData.length - 1]?.end_time&&employeeAttendence?.employee_id == employee._id && attendenceFunctionConditionV} disabled= {attendeceData[attendeceData.length - 1]?.end_time&&employeeAttendence?.employee_id == employee._id && attendenceFunctionConditionV}onClick={() => {
-
-                                    attendenceEnd(attendeceData[attendeceData.length - 1]._id)
-                                }}></input>
-                                <label >End</label>
-                            </div>
-                            <div>
-                                <button onClick={() => {
-                                    //callAttendence(employee._id)
-                                }}>Show Data</button>
-                            </div>
-
-                        </Descriptions.Item>
-                    </Descriptions>
-                </div>}
-
+                </div>
             </div>
-        </div>
+        </>
     )
 }
 

@@ -75,7 +75,7 @@ const Login = () => {
                         />
                     </div>
                     <div className="d-grid gap-2 mt-3">
-                        <button type="submit" className="btn btn-primary" onClick={handleSubmit}>
+                        <button  type="submit" className="btn btn-primary" onClick={handleSubmit}>
                             Submit
                         </button>
                     </div>

@@ -1,3 +1,23 @@
 .employeePage{
     margin-top: 80px;
 }
+
+button {
+    display: inline-block;
+    padding:  10px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    color: #fff;
+    background-color: black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 2px;
+  }
+  
+  button:hover {
+    background-color: grey;
+  }

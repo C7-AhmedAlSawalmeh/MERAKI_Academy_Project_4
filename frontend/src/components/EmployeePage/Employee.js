@@ -110,7 +110,7 @@ const Employee = () => {
         <Descriptions.Item label="Salary">{emplyoee[0].salary.hourly_salary * 8} JOD</Descriptions.Item>
         <Descriptions.Item label="Schedule">
           <button onClick={showModalShow}>Show Schedule</button>
-          <Modal title="test" open={isMpdalOpen_2} onOk={handleShowOk} onCancel={handleCancel} width={1000}>
+          <Modal title="Your Schedule" open={isMpdalOpen_2} onOk={handleShowOk} onCancel={handleCancel} width={1000}>
             <>
               <WeeklyCalendar
                 events={events}

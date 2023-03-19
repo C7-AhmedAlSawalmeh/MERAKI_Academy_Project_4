@@ -20,9 +20,9 @@ const NavBar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-container">
-      <Link className="navbar-logo" to={"/"}><a href="#" className="navbar-logo">
+      <Link className="navbar-logo" to={"/"}><p  className="navbar-logo">
           System
-        </a></Link> 
+        </p></Link> 
         <ul className="navbar-menu">
           <li className="navbar-item">
             <a href="#" className="navbar-link">
@@ -38,6 +38,9 @@ const NavBar = () => {
           </li >
           <li className="navbar-item">
           {token&&<Link  className="navbar-link" to={"/managerPage"}><p className='navbar-link'>Manger Page</p></Link>}
+          </li >
+          <li className="navbar-item">
+          {normalToken&&<Link  className="navbar-link" to={"/employeePage"}><p className='navbar-link'>Emplyoee Page</p></Link>}
           </li >
         </ul>
          <div className="navbar-toggle">

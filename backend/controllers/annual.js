@@ -68,7 +68,7 @@ const updateAnnual = (req,res)=>{
     const id = req.params.id
     const update = req.body
     annualModel
-    .findByIdAndUpdate({id},update,{new:true})
+    .findByIdAndUpdate({_id:id},update,{new:true})
     .then((result)=>{
         if(!result){
             return res.status(403).json({
