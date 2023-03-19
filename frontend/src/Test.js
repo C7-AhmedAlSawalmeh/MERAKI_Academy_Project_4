@@ -1,24 +1,49 @@
-import React from 'react'
-import {
-    WeeklyCalendar,
-  } from 'antd-weekly-calendar';
-  
-  const events = [
-    { startTime: new Date(2023, 2, 21, 12, 0, 0), endTime: new Date(2023, 2, 21, 14, 30, 0), title: 'Ap. 1', backgroundColor: 'red' },
-    { startTime: new Date(2023, 2, 25, 10, 0, 0), endTime: new Date(2023, 2, 25, 17, 15, 0), title: 'Ap. 1' },
-  ];
-console.log(events[0].startTime)
+
+import "./test.css"
+
+
 const Test = () => {
+  
+
   return (
     <>
-        <WeeklyCalendar
-            events={events}
-            onEventClick={(event) => console.log(event)}
-            onSelectDate={(date) => console.log(date)}
-            weekends="false"
-        />
+    <nav className="navbar">
+      <div className="navbar-container">
+        <a href="#" className="navbar-logo">
+          Logo
+        </a>
+        <ul className="navbar-menu">
+          <li className="navbar-item">
+            <a href="#" className="navbar-link">
+              Home
+            </a>
+          </li>
+          <li className="navbar-item">
+            <a href="#" className="navbar-link">
+              About
+            </a>
+          </li>
+          <li className="navbar-item">
+            <a href="#" className="navbar-link">
+              Services
+            </a>
+          </li>
+          <li className="navbar-item">
+            <a href="#" className="navbar-link">
+              Contact
+            </a>
+          </li>
+        </ul>
+        <div className="navbar-toggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </nav>
       </>
   )
 }
 
 export default Test
+

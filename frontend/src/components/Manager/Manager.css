@@ -1,6 +1,7 @@
 .managerPage{
     display: flex;
     justify-content: center;
+    margin-top: 80px;
 }
 #scrollableDiv{
     margin-right: 150px;

@@ -1,10 +1,11 @@
 .bottomContainer{
     display: flex;
+    color: white;
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: 70px;
-    background-color: #014751;
+    height: 80px;
+    background-color: black;
     margin: 0px;
     padding: 0px;
 }

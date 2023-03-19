@@ -7,7 +7,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import axios from 'axios';
 import { Data } from "../../App"
 import { WeeklyCalendar, } from 'antd-weekly-calendar';
-
+import "./Employee.css"
 
 const { RangePicker } = DatePicker;
 
@@ -93,7 +93,7 @@ const Employee = () => {
 
  
   return (
-    <div>
+    <div className='employeePage'>
       {emplyoee?.length && <Descriptions title={emplyoee[0].name} layout="vertical" bordered>
         <Descriptions.Item label="Name">{emplyoee[0].name}</Descriptions.Item>
         <Descriptions.Item label="Employee ID">{emplyoee[0].employeeId}</Descriptions.Item>

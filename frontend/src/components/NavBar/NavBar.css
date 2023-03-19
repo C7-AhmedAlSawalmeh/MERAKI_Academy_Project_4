@@ -1,45 +1,99 @@
-.navContainer {
-    background-color: #014751;
+.navbar {
+    
+    
+    background-color: #fff;
+    color: #333;
+    height: 80px;
+    border-bottom: 1px solid #ccc;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    transition: background-color 0.3s ease-in-out;
+    
+  }
+  
+  .navbar-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 30px;
+  }
+  
+  .navbar-logo {
+    font-size: 24px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #333;
+  }
+  
+  .navbar-menu {
     display: flex;
     justify-content: space-between;
     align-items: center;
-
-
-}
-
-.loginBtn {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .navbar-item {
+    margin: 0 10px;
+  }
+  
+  .navbar-link {
     cursor: pointer;
-    height: 50px;
-    width: 120px;
-    border-radius: 15px;
-    background-color: #CC3262;
-    opacity: .9;
-    margin-right: 50px;
-    
-}
-.logOutBtn{
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 15px;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .navbar-link:hover {
+    color: #999;
+  }
+  
+  .navbar-toggle {
+    display: none;
     cursor: pointer;
-    height: 50px;
-    width: 120px;
-    border-radius: 15px;
-    background-color: #CC3262;
-    opacity: .9;
-    margin-right: 50px;
-}
-.registerBtn{
-    cursor: pointer;
-    height: 50px;
-    width: 120px;
-    border-radius: 15px;
-    background-color: #CC3262;
-    opacity: .9;
-    margin-right: 50px;
-}
-.loginBtn:hover, .logOutBtn:hover , .registerBtn:hover {
-    opacity: 1;
-}
-
-.logo {
-    cursor: pointer;
-    margin-left: 50px;
-}
+  }
+  
+  .navbar-toggle span {
+    display: block;
+    width: 25px;
+    height: 2px;
+    margin: 5px;
+    background-color: #333;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  @media (max-width: 768px) {
+    .navbar-menu {
+      display: none;
+    }
+  
+    .navbar-toggle {
+      display: block;
+    }
+  
+    .navbar-toggle.active span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 6px);
+    }
+  
+    .navbar-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+  
+    .navbar-toggle.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -6px);
+    }
+  
+    .navbar-toggle:hover span {
+      background-color: #999;
+    }
+  }

@@ -17,7 +17,7 @@ const Home = () => {
 
     return (
         <div className='homeContainer'>
-<ReactCardSlider  slides={slides}/>
+Hello
         </div>
     )
 }
